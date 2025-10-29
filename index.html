@@ -49,24 +49,35 @@
         .wheel {
             width: 100%;
             height: 100%;
-            background: conic-gradient(
-                from 0deg,
-                #ff6b6b 0deg 36deg,
-                #4ecdc4 36deg 72deg,
-                #45b7d1 72deg 108deg,
-                #96ceb4 108deg 144deg,
-                #feca57 144deg 180deg,
-                #ff9ff3 180deg 216deg,
-                #54a0ff 216deg 252deg,
-                #5f27cd 252deg 288deg,
-                #00d2d3 288deg 324deg,
-                #ff9f43 324deg 360deg
-            );
             border-radius: 50%;
             border: 8px solid #ff1493;
             position: relative;
             transition: transform 3s cubic-bezier(0.2, 0.8, 0.3, 1);
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .segment {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            top: 0;
+            left: 50%;
+            transform-origin: 0% 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .segment-content {
+            position: absolute;
+            width: 120px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: #000000;
+            transform-origin: center;
+            margin-top: 20px;
         }
         
         .pointer {
@@ -84,23 +95,6 @@
         @keyframes bounce {
             0% { transform: translateX(-50%) translateY(0px); }
             100% { transform: translateX(-50%) translateY(-10px); }
-        }
-        
-        .prize-label {
-            position: absolute;
-            font-size: 12px;
-            font-weight: bold;
-            color: #000000;
-            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
-            transform-origin: center;
-            text-align: center;
-            width: 50px;
-            height: 20px;
-            line-height: 20px;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.9);
-            pointer-events: none;
         }
         
         button {
@@ -149,7 +143,7 @@
         <div class="wheel-container">
             <div class="pointer">⬇</div>
             <div class="wheel" id="wheel">
-                <!-- Призы будут добавляться через JS -->
+                <!-- Сегменты будут добавляться через JS -->
             </div>
         </div>
         
@@ -166,32 +160,35 @@
             "700 РУБ", "800 РУБ", "900 РУБ", "1000 РУБ"
         ];
         
+        const colors = [
+            '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', 
+            '#feca57', '#ff9ff3', '#54a0ff', '#5f27cd', 
+            '#00d2d3', '#ff9f43'
+        ];
+        
         let isSpinning = false;
         const wheel = document.getElementById('wheel');
         const result = document.getElementById('result');
         const pointer = document.querySelector('.pointer');
         
-        // Создаем деления рулетки
+        // Создаем сегменты рулетки
         function createWheelSegments() {
             wheel.innerHTML = '';
             const segmentAngle = 360 / prizes.length;
-            const radius = 150;
             
             prizes.forEach((prize, index) => {
-                const angle = index * segmentAngle;
-                const label = document.createElement('div');
-                label.className = 'prize-label';
-                label.textContent = prize;
+                const segment = document.createElement('div');
+                segment.className = 'segment';
+                segment.style.transform = `rotate(${index * segmentAngle}deg)`;
+                segment.style.background = colors[index];
                 
-                const radian = (angle + segmentAngle/2) * Math.PI / 180;
-                const x = radius * Math.cos(radian);
-                const y = radius * Math.sin(radian);
+                const content = document.createElement('div');
+                content.className = 'segment-content';
+                content.textContent = prize;
+                content.style.transform = `rotate(${segmentAngle/2}deg)`;
                 
-                label.style.left = `calc(50% + ${x}px)`;
-                label.style.top = `calc(50% + ${y}px)`;
-                label.style.transform = `translate(-50%, -50%) rotate(${angle + segmentAngle/2}deg)`;
-                
-                wheel.appendChild(label);
+                segment.appendChild(content);
+                wheel.appendChild(segment);
             });
         }
         
