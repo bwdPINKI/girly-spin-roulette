@@ -67,6 +67,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            border-right: 2px solid #000000; /* Черные разделители */
         }
         
         .segment-content {
@@ -82,19 +83,22 @@
         
         .pointer {
             position: absolute;
-            top: -40px;
+            top: -35px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 50px;
+            font-size: 40px;
             z-index: 10;
-            animation: bounce 0.5s ease-in-out infinite alternate;
+            animation: vibrate 0.1s ease-in-out infinite;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
             color: #ff1493;
         }
         
-        @keyframes bounce {
-            0% { transform: translateX(-50%) translateY(0px); }
-            100% { transform: translateX(-50%) translateY(-10px); }
+        @keyframes vibrate {
+            0% { transform: translateX(-50%) rotate(-1deg); }
+            25% { transform: translateX(-50%) rotate(1deg); }
+            50% { transform: translateX(-50%) rotate(-1deg); }
+            75% { transform: translateX(-50%) rotate(1deg); }
+            100% { transform: translateX(-50%) rotate(-1deg); }
         }
         
         button {
@@ -138,7 +142,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>girly spin 🎰</h1>
+        <h1>girli spin💞</h1>
         
         <div class="wheel-container">
             <div class="pointer">⬇</div>
@@ -198,8 +202,8 @@
             isSpinning = true;
             result.textContent = "";
             
-            // Останавливаем анимацию стрелки на время вращения
-            pointer.style.animation = 'none';
+            // Усиливаем вибрацию стрелки во время вращения
+            pointer.style.animation = 'vibrate 0.05s ease-in-out infinite';
             
             wheel.style.transition = 'transform 3s cubic-bezier(0.2, 0.8, 0.3, 1)';
             const randomRotations = 5 + Math.random() * 5;
@@ -214,8 +218,8 @@
                 result.innerHTML = `🎉 Поздравляем! Вам выпало: <br><span style="font-size: 36px; color: #ff1493;">${wonPrize}</span>`;
                 isSpinning = false;
                 
-                // Возвращаем анимацию стрелки
-                pointer.style.animation = 'bounce 0.5s ease-in-out infinite alternate';
+                // Возвращаем обычную вибрацию стрелки
+                pointer.style.animation = 'vibrate 0.1s ease-in-out infinite';
                 
                 if (window.Telegram && Telegram.WebApp) {
                     Telegram.WebApp.sendData(JSON.stringify({
