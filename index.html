@@ -69,40 +69,38 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
         
-        .wheel.spinning {
-            animation: spin 0.5s linear infinite;
-        }
-        
-        @keyframes spin {
-            100% { transform: rotate(360deg); }
-        }
-        
         .pointer {
             position: absolute;
-            top: -20px;
+            top: -40px;
             left: 50%;
             transform: translateX(-50%);
-            width: 40px;
-            height: 40px;
-            background: #ff1493;
-            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            font-size: 50px;
             z-index: 10;
+            animation: bounce 0.5s ease-in-out infinite alternate;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            color: #ff1493;
+        }
+        
+        @keyframes bounce {
+            0% { transform: translateX(-50%) translateY(0px); }
+            100% { transform: translateX(-50%) translateY(-10px); }
         }
         
         .prize-label {
             position: absolute;
-            font-size: 16px;
+            font-size: 12px;
             font-weight: bold;
-            color: #000000; /* ЧЕРНЫЙ цвет цифр */
+            color: #000000;
             text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
             transform-origin: center;
             text-align: center;
-            width: 80px;
-            height: 30px;
-            line-height: 30px;
-            background: rgba(255, 255, 255, 0.7);
-            border-radius: 15px;
-            border: 2px solid rgba(255, 255, 255, 0.9);
+            width: 50px;
+            height: 20px;
+            line-height: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            pointer-events: none;
         }
         
         button {
@@ -122,10 +120,6 @@
         button:hover {
             transform: translateY(-3px);
             box-shadow: 0 15px 30px rgba(255, 20, 147, 0.4);
-        }
-        
-        button:active {
-            transform: translateY(1px);
         }
         
         .result {
@@ -153,7 +147,7 @@
         <h1>girly spin 🎰</h1>
         
         <div class="wheel-container">
-            <div class="pointer"></div>
+            <div class="pointer">⬇</div>
             <div class="wheel" id="wheel">
                 <!-- Призы будут добавляться через JS -->
             </div>
@@ -175,12 +169,13 @@
         let isSpinning = false;
         const wheel = document.getElementById('wheel');
         const result = document.getElementById('result');
+        const pointer = document.querySelector('.pointer');
         
         // Создаем деления рулетки
         function createWheelSegments() {
             wheel.innerHTML = '';
             const segmentAngle = 360 / prizes.length;
-            const radius = 180; // Радиус барабана
+            const radius = 150;
             
             prizes.forEach((prize, index) => {
                 const angle = index * segmentAngle;
@@ -188,7 +183,6 @@
                 label.className = 'prize-label';
                 label.textContent = prize;
                 
-                // Правильное позиционирование по кругу
                 const radian = (angle + segmentAngle/2) * Math.PI / 180;
                 const x = radius * Math.cos(radian);
                 const y = radius * Math.sin(radian);
@@ -207,22 +201,25 @@
             isSpinning = true;
             result.textContent = "";
             
-            // Запускаем анимацию вращения
+            // Останавливаем анимацию стрелки на время вращения
+            pointer.style.animation = 'none';
+            
             wheel.style.transition = 'transform 3s cubic-bezier(0.2, 0.8, 0.3, 1)';
-            const randomRotations = 5 + Math.random() * 5; // 5-10 полных оборотов
+            const randomRotations = 5 + Math.random() * 5;
             const randomPrizeIndex = Math.floor(Math.random() * prizes.length);
             const segmentAngle = 360 / prizes.length;
-            const targetAngle = 3600 + (randomPrizeIndex * segmentAngle) + (Math.random() * segmentAngle - segmentAngle/2);
+            const targetAngle = 3600 + (randomPrizeIndex * segmentAngle);
             
             wheel.style.transform = `rotate(${targetAngle}deg)`;
             
-            // Показываем результат через 3 секунды
             setTimeout(() => {
                 const wonPrize = prizes[randomPrizeIndex];
                 result.innerHTML = `🎉 Поздравляем! Вам выпало: <br><span style="font-size: 36px; color: #ff1493;">${wonPrize}</span>`;
                 isSpinning = false;
                 
-                // Отправляем результат в бота
+                // Возвращаем анимацию стрелки
+                pointer.style.animation = 'bounce 0.5s ease-in-out infinite alternate';
+                
                 if (window.Telegram && Telegram.WebApp) {
                     Telegram.WebApp.sendData(JSON.stringify({
                         prize: wonPrize,
@@ -246,7 +243,6 @@
                     confetti.style.opacity = '1';
                     document.body.appendChild(confetti);
                     
-                    // Анимация падения
                     confetti.animate([
                         { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
                         { transform: `translateY(100vh) rotate(${Math.random() * 360}deg)`, opacity: 0 }
@@ -255,7 +251,6 @@
                         easing: 'cubic-bezier(0.1, 0.8, 0.3, 1)'
                     });
                     
-                    // Удаляем конфетти после анимации
                     setTimeout(() => confetti.remove(), 4000);
                 }, i * 100);
             }
