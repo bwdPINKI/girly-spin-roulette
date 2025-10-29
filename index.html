@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Girly Spin Roulette</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+            text-align: center;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px auto;
+            max-width: 300px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .wheel {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            border-radius: 50%;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #8B4513;
+            border: 5px solid #8B4513;
+            transition: transform 2s;
+        }
+        .spinning {
+            animation: spin 2s linear infinite;
+        }
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+        button {
+            background: linear-gradient(45deg, #FF69B4, #FF1493);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            transform: scale(1.05);
+        }
+        .prize {
+            font-size: 24px;
+            color: #FF1493;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎰 GIRLY SPIN 🎰</h1>
+        <div class="wheel" id="wheel">?</div>
+        <button onclick="spin()">Крутить рулетку!</button>
+        <div class="prize" id="prize"></div>
+    </div>
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        let isSpinning = false;
+        
+        function spin() {
+            if (isSpinning) return;
+            
+            isSpinning = true;
+            const wheel = document.getElementById('wheel');
+            const prizeElement = document.getElementById('prize');
+            
+            // Запускаем анимацию
+            wheel.classList.add('spinning');
+            prizeElement.textContent = "";
+            
+            // Случайный приз через 2 секунды
+            setTimeout(() => {
+                const prizes = ["🎉 100 РУБ!", "🎊 500 РУБ!", "💰 1000 РУБ!", "😢 УПС!"];
+                const randomPrize = prizes[Math.floor(Math.random() * prizes.length)];
+                
+                wheel.classList.remove('spinning');
+                wheel.textContent = randomPrize;
+                prizeElement.textContent = `Вы выиграли: ${randomPrize}`;
+                isSpinning = false;
+                
+                // Отправляем результат в бота
+                if (window.Telegram && Telegram.WebApp) {
+                    Telegram.WebApp.sendData(JSON.stringify({
+                        prize: randomPrize,
+                        user_id: Telegram.WebApp.initDataUnsafe.user?.id
+                    }));
+                }
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
