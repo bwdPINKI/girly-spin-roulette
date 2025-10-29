@@ -91,13 +91,18 @@
         
         .prize-label {
             position: absolute;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: bold;
-            color: white;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            color: #000000; /* ЧЕРНЫЙ цвет цифр */
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
             transform-origin: center;
             text-align: center;
-            width: 60px;
+            width: 80px;
+            height: 30px;
+            line-height: 30px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.9);
         }
         
         button {
@@ -175,13 +180,23 @@
         function createWheelSegments() {
             wheel.innerHTML = '';
             const segmentAngle = 360 / prizes.length;
+            const radius = 180; // Радиус барабана
             
             prizes.forEach((prize, index) => {
                 const angle = index * segmentAngle;
                 const label = document.createElement('div');
                 label.className = 'prize-label';
                 label.textContent = prize;
-                label.style.transform = `rotate(${angle + segmentAngle/2}deg) translate(140px) rotate(-${angle + segmentAngle/2}deg)`;
+                
+                // Правильное позиционирование по кругу
+                const radian = (angle + segmentAngle/2) * Math.PI / 180;
+                const x = radius * Math.cos(radian);
+                const y = radius * Math.sin(radian);
+                
+                label.style.left = `calc(50% + ${x}px)`;
+                label.style.top = `calc(50% + ${y}px)`;
+                label.style.transform = `translate(-50%, -50%) rotate(${angle + segmentAngle/2}deg)`;
+                
                 wheel.appendChild(label);
             });
         }
