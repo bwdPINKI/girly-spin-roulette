@@ -69,19 +69,6 @@
             overflow: hidden;
             transition: transform 4s cubic-bezier(0.2, 0.8, 0.3, 1);
             box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-            background: conic-gradient(
-                from 0deg,
-                #ff6b6b 0deg 36deg,
-                #4ecdc4 36deg 72deg,
-                #45b7d1 72deg 108deg,
-                #96ceb4 108deg 144deg,
-                #feca57 144deg 180deg,
-                #ff9ff3 180deg 216deg,
-                #54a0ff 216deg 252deg,
-                #5f27cd 252deg 288deg,
-                #00d2d3 288deg 324deg,
-                #ff9f43 324deg 360deg
-            );
         }
 
         .wheel::before {
@@ -107,12 +94,13 @@
             transform-origin: 0% 100%;
         }
 
+        /* Черные разделители между секторами */
         .segment::before {
             content: '';
             position: absolute;
             top: 0;
             right: 0;
-            width: 2px;
+            width: 3px;
             height: 100%;
             background: #000;
             z-index: 1;
@@ -120,25 +108,23 @@
 
         .segment-content {
             position: absolute;
-            top: 60px;
-            left: 30px;
+            top: 80px;
+            left: 40px;
             transform-origin: center;
             font-size: 14px;
             font-weight: bold;
             color: #000;
             text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
             z-index: 3;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 4px 8px;
-            border-radius: 8px;
-            border: 1px solid rgba(0,0,0,0.1);
+            /* Убрал белый фон */
+            padding: 2px 4px;
         }
 
         .pointer {
             position: absolute;
-            top: -30px;
+            top: -25px;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translateX(-50%) rotate(180deg); /* Отзеркалили стрелку */
             z-index: 10;
             width: 40px;
             height: 40px;
@@ -291,7 +277,7 @@
             updateSpinCount();
         }
 
-        // Создание сегментов рулетки
+        // Создание сегментов рулетки с правильным позиционированием цифр
         function createWheelSegments() {
             elements.wheel.innerHTML = '';
             const segmentAngle = 360 / CONFIG.prizes.length;
@@ -300,12 +286,17 @@
                 const segment = document.createElement('div');
                 segment.className = 'segment';
                 segment.style.transform = `rotate(${index * segmentAngle}deg)`;
+                segment.style.background = CONFIG.colors[index];
 
                 const content = document.createElement('div');
                 content.className = 'segment-content';
                 content.textContent = prize;
-                content.style.transform = `rotate(${segmentAngle / 2}deg)`;
-
+                
+                // Поворачиваем цифры чтобы они были вертикально в своих секторах
+                // и корректируем позиционирование
+                const contentRotation = segmentAngle / 2;
+                content.style.transform = `rotate(${contentRotation}deg)`;
+                
                 segment.appendChild(content);
                 elements.wheel.appendChild(segment);
             });
