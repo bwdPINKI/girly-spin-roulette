@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>girly spin - Fixed Version</title>
+    <title>girly spin - TEST Version</title>
     <style>
         body {
             background: linear-gradient(135deg, #ffb6c1, #ff69b4);
@@ -55,11 +55,11 @@
             background: #ff1493;
             color: white;
             border: none;
-            padding: 15px 30px;
-            font-size: 18px;
+            padding: 10px 20px;
+            font-size: 16px;
             border-radius: 25px;
             cursor: pointer;
-            margin: 15px 0;
+            margin: 5px;
         }
         
         .result {
@@ -69,19 +69,37 @@
             margin: 15px 0;
             min-height: 40px;
         }
+        
+        .test-controls {
+            margin: 15px 0;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>girly spin💞</h1>
+        <h1>girly spin💞 - ТЕСТ</h1>
         
         <div class="wheel-container">
             <div class="pointer">▼</div>
             <canvas id="wheelCanvas" width="400" height="400"></canvas>
         </div>
         
-        <button onclick="startSpin()">Крутить барабан!</button>
-        <div class="result" id="result">Нажмите кнопку!</div>
+        <div class="test-controls">
+            <button onclick="testSpin(0)">Тест: 100 РУБ</button>
+            <button onclick="testSpin(1)">Тест: 200 РУБ</button>
+            <button onclick="testSpin(2)">Тест: 300 РУБ</button>
+            <button onclick="testSpin(3)">Тест: 400 РУБ</button>
+            <button onclick="testSpin(4)">Тест: 500 РУБ</button>
+            <br>
+            <button onclick="testSpin(5)">Тест: 600 РУБ</button>
+            <button onclick="testSpin(6)">Тест: 700 РУБ</button>
+            <button onclick="testSpin(7)">Тест: 800 РУБ</button>
+            <button onclick="testSpin(8)">Тест: 900 РУБ</button>
+            <button onclick="testSpin(9)">Тест: 1000 РУБ</button>
+        </div>
+        
+        <button onclick="randomSpin()">Случайный спин</button>
+        <div class="result" id="result">Нажмите кнопку теста!</div>
     </div>
 
     <script>
@@ -94,7 +112,6 @@
         
         let isSpinning = false;
 
-        // Рисуем рулетку
         function drawWheel(rotation = 0) {
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
@@ -144,26 +161,29 @@
             ctx.restore();
         }
 
-        function startSpin() {
+        function testSpin(targetIndex) {
             if (isSpinning) return;
             
             isSpinning = true;
-            document.getElementById('result').textContent = 'Крутим...';
+            document.getElementById('result').textContent = `Тестируем: ${prizes[targetIndex]}...`;
             
-            // ПРОСТО: выбираем приз и крутим к нему
-            const winningIndex = Math.floor(Math.random() * prizes.length);
             const segmentAngle = (2 * Math.PI) / prizes.length;
             
-            // Стрелка вверху (0°), поэтому выигрышный сегмент должен оказаться вверху
-            const targetRotation = - (winningIndex * segmentAngle);
+            // ПРОБУЕМ РАЗНЫЕ ВАРИАНТЫ:
             
-            // Добавляем несколько полных оборотов для красоты
-            const fullRotations = 5 * 2 * Math.PI;
+            // Вариант 1: Простой (скорее всего этот)
+            const targetRotation = - (targetIndex * segmentAngle);
+            
+            // Вариант 2: Со смещением (если не работает вариант 1)
+            // const offset = 2; // Смещение на 2 сегмента
+            // const targetRotation = - ((targetIndex + offset) % prizes.length * segmentAngle);
+            
+            const fullRotations = 3 * 2 * Math.PI; // Меньше оборотов для теста
             const finalRotation = fullRotations + targetRotation;
             
             let startRotation = 0;
             const startTime = performance.now();
-            const duration = 3000;
+            const duration = 2000;
             
             function animate(currentTime) {
                 const elapsed = currentTime - startTime;
@@ -178,19 +198,21 @@
                     requestAnimationFrame(animate);
                 } else {
                     isSpinning = false;
+                    // Проверяем что оказалось под стрелкой
+                    const finalAngle = (currentRotation % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+                    const winningIndex = Math.floor((2 * Math.PI - finalAngle) / segmentAngle) % prizes.length;
+                    
                     document.getElementById('result').textContent = 
-                        `🎉 Вы выиграли: ${prizes[winningIndex]}!`;
-                        
-                    if (window.Telegram && Telegram.WebApp) {
-                        Telegram.WebApp.sendData(JSON.stringify({
-                            prize: prizes[winningIndex],
-                            user_id: Telegram.WebApp.initDataUnsafe.user?.id
-                        }));
-                    }
+                        `Задумано: ${prizes[targetIndex]}, Стрелка указывает на: ${prizes[winningIndex]}`;
                 }
             }
             
             requestAnimationFrame(animate);
+        }
+
+        function randomSpin() {
+            const randomIndex = Math.floor(Math.random() * prizes.length);
+            testSpin(randomIndex);
         }
 
         // Инициализация
