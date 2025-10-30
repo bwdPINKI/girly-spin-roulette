@@ -162,16 +162,19 @@
             
             const randomPrizeIndex = Math.floor(Math.random() * prizes.length);
             const segmentAngle = (2 * Math.PI) / prizes.length;
-            const targetRotation = currentRotation + (4 * Math.PI * 2) + (randomPrizeIndex * segmentAngle);
+            
+            // Вращение: 5-8 полных оборотов + выигрышный сегмент
+            const fullRotations = 5 + Math.random() * 3;
+            const targetRotation = currentRotation + (fullRotations * Math.PI * 2) + (randomPrizeIndex * segmentAngle);
             
             const startTime = performance.now();
-            const duration = 4000; // 4 секунды
+            const duration = 4000;
             
             function animate(currentTime) {
                 const elapsed = currentTime - startTime;
                 const progress = Math.min(elapsed / duration, 1);
                 
-                // Эффект плавного замедления
+                // Плавное замедление
                 const easeOut = 1 - Math.pow(1 - progress, 3);
                 currentRotation = easeOut * targetRotation;
                 
@@ -180,15 +183,20 @@
                 if (progress < 1) {
                     requestAnimationFrame(animate);
                 } else {
-                    // Завершение анимации
+                    // ПРАВИЛЬНО вычисляем выигрышный сегмент
+                    const normalizedRotation = currentRotation % (Math.PI * 2);
+                    // Стрелка вверху (0°), поэтому вычитаем из полного круга
+                    const pointerAngle = (2 * Math.PI - normalizedRotation) % (2 * Math.PI);
+                    const winningIndex = Math.floor(pointerAngle / segmentAngle) % prizes.length;
+                    
                     isSpinning = false;
                     document.getElementById('result').textContent = 
-                        `🎉 Вы выиграли: ${prizes[randomPrizeIndex]}!`;
+                        `🎉 Вы выиграли: ${prizes[winningIndex]}!`;
                         
                     // Отправка в Telegram
                     if (window.Telegram && Telegram.WebApp) {
                         Telegram.WebApp.sendData(JSON.stringify({
-                            prize: prizes[randomPrizeIndex],
+                            prize: prizes[winningIndex],
                             user_id: Telegram.WebApp.initDataUnsafe.user?.id
                         }));
                     }
