@@ -13,8 +13,6 @@
 
         body {
             background: linear-gradient(135deg, #ffb6c1, #ff69b4, #ff1493);
-            background-size: 400% 400%;
-            animation: gradient 15s ease infinite;
             font-family: 'Arial', sans-serif;
             display: flex;
             justify-content: center;
@@ -23,68 +21,54 @@
             padding: 20px;
         }
 
-        @keyframes gradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
         .container {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 30px;
-            padding: 40px;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
             max-width: 500px;
             width: 100%;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             text-align: center;
         }
 
         .title {
             color: #ff1493;
-            font-size: 36px;
+            font-size: 32px;
             margin-bottom: 30px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
             font-weight: bold;
-        }
-
-        .wheel-section {
-            position: relative;
-            margin: 40px 0;
         }
 
         .wheel-container {
             position: relative;
-            width: 350px;
-            height: 350px;
-            margin: 0 auto;
+            width: 400px;
+            height: 400px;
+            margin: 0 auto 30px;
         }
 
+        /* ОСНОВНОЙ КРУГ КАК НА WHEELOFNAMES */
         .wheel {
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            border: 10px solid #ff1493;
             position: relative;
             overflow: hidden;
-            transition: transform 4s cubic-bezier(0.2, 0.8, 0.3, 1);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            transition: transform 5s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+            box-shadow: 0 0 0 8px #ff1493, 0 10px 30px rgba(0,0,0,0.3);
+            background: conic-gradient(
+                #ff6b6b 0deg 36deg,
+                #4ecdc4 36deg 72deg,
+                #45b7d1 72deg 108deg,
+                #96ceb4 108deg 144deg,
+                #feca57 144deg 180deg,
+                #ff9ff3 180deg 216deg,
+                #54a0ff 216deg 252deg,
+                #5f27cd 252deg 288deg,
+                #00d2d3 288deg 324deg,
+                #ff9f43 324deg 360deg
+            );
         }
 
-        .wheel::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80px;
-            height: 80px;
-            background: white;
-            border-radius: 50%;
-            border: 5px solid #ff1493;
-            z-index: 2;
-        }
-
+        /* СЕГМЕНТЫ С ТОЛСТЫМИ РАЗДЕЛИТЕЛЯМИ */
         .segment {
             position: absolute;
             width: 50%;
@@ -94,120 +78,82 @@
             transform-origin: 0% 100%;
         }
 
-        /* Черные разделители между секторами */
-        .segment::before {
+        .segment::after {
             content: '';
             position: absolute;
             top: 0;
-            right: 0;
-            width: 3px;
+            right: -1px;
+            width: 4px;
             height: 100%;
             background: #000;
-            z-index: 1;
+            z-index: 2;
         }
 
-        .segment-content {
+        /* ЦИФРЫ КАК У НИХ */
+        .segment span {
             position: absolute;
-            top: 90px;
-            left: 45px;
+            top: 70px;
+            left: 30px;
             transform-origin: center;
-            font-size: 16px;
-            font-weight: bold;
+            font-size: 18px;
+            font-weight: 900;
             color: #000;
-            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+            text-shadow: 1px 1px 0 rgba(255,255,255,0.8);
             z-index: 3;
-            padding: 2px 4px;
         }
 
+        /* СТРЕЛКА КАК У НИХ */
         .pointer {
             position: absolute;
-            top: -50px;
+            top: -35px;
             left: 50%;
-            transform: translateX(-50%) rotate(180deg);
+            transform: translateX(-50%);
             z-index: 10;
-            width: 80px;
-            height: 80px;
+            width: 60px;
+            height: 70px;
         }
 
-        .pointer-svg {
-            width: 100%;
-            height: 100%;
-            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+        .pointer::before {
+            content: '▼';
+            font-size: 50px;
+            color: #800020;
+            text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
         }
 
+        /* КНОПКА */
         .spin-button {
             background: linear-gradient(45deg, #ff1493, #ff69b4);
             color: white;
             border: none;
-            padding: 20px 50px;
+            padding: 18px 45px;
             font-size: 20px;
             font-weight: bold;
             border-radius: 50px;
             cursor: pointer;
-            margin: 25px 0;
-            box-shadow: 0 10px 25px rgba(255, 20, 147, 0.3);
+            margin: 10px 0;
+            box-shadow: 0 6px 20px rgba(255, 20, 147, 0.4);
             transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
         }
 
         .spin-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 35px rgba(255, 20, 147, 0.4);
-        }
-
-        .spin-button:active {
-            transform: translateY(1px);
-        }
-
-        .spin-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 20, 147, 0.5);
         }
 
         .result {
             font-size: 24px;
             color: #ff1493;
             font-weight: bold;
-            margin: 25px 0;
-            min-height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            gap: 10px;
+            margin: 20px 0;
+            min-height: 60px;
         }
 
         .prize-amount {
-            font-size: 42px;
+            font-size: 38px;
             color: #ff1493;
             font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .confetti {
-            position: fixed;
-            width: 12px;
-            height: 12px;
-            pointer-events: none;
-            opacity: 0;
-        }
-
-        .spin-count {
-            font-size: 14px;
-            color: #666;
-            margin-top: 10px;
-        }
-
-        @keyframes celebrate {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
-        .celebrate {
-            animation: celebrate 0.5s ease-in-out 3;
+            margin: 10px 0;
         }
     </style>
 </head>
@@ -215,207 +161,85 @@
     <div class="container">
         <h1 class="title">girli spin💞</h1>
         
-        <div class="wheel-section">
-            <div class="wheel-container">
-                <div class="pointer">
-                    <svg class="pointer-svg" viewBox="0 0 100 100">
-                        <path d="M50 10 L60 60 L40 60 Z" fill="#800020" stroke="#000" stroke-width="3"/>
-                        <circle cx="50" cy="65" r="8" fill="#800020" stroke="#000" stroke-width="2"/>
-                    </svg>
-                </div>
-                <div class="wheel" id="wheel">
-                    <!-- Сегменты будут созданы через JavaScript -->
-                </div>
+        <div class="wheel-container">
+            <div class="pointer"></div>
+            <div class="wheel" id="wheel">
+                <!-- Сегменты создаются через JS -->
             </div>
         </div>
 
         <button class="spin-button" id="spinButton" onclick="spinWheel()">
-            Крутить барабан! 💫
+            Крутить барабан! 
         </button>
 
         <div class="result" id="result">
-            Нажмите кнопку чтобы начать! 🎰
-        </div>
-
-        <div class="spin-count" id="spinCount">
-            Сделано вращений: 0
+            Нажмите кнопку чтобы начать!
         </div>
     </div>
 
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
-        // Конфигурация рулетки
-        const CONFIG = {
-            prizes: ["100 РУБ", "200 РУБ", "300 РУБ", "400 РУБ", "500 РУБ", 
-                    "600 РУБ", "700 РУБ", "800 РУБ", "900 РУБ", "1000 РУБ"],
-            colors: ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', 
-                    '#ff9ff3', '#54a0ff', '#5f27cd', '#00d2d3', '#ff9f43'],
-            minRotations: 5,
-            maxRotations: 8,
-            spinDuration: 4000
-        };
+        const prizes = ["100 РУБ", "200 РУБ", "300 РУБ", "400 РУБ", "500 РУБ", 
+                       "600 РУБ", "700 РУБ", "800 РУБ", "900 РУБ", "1000 РУБ"];
 
-        // Состояние приложения
-        let state = {
-            isSpinning: false,
-            spinCount: 0,
-            currentRotation: 0
-        };
+        let isSpinning = false;
 
-        // Элементы DOM
-        const elements = {
-            wheel: document.getElementById('wheel'),
-            spinButton: document.getElementById('spinButton'),
-            result: document.getElementById('result'),
-            spinCount: document.getElementById('spinCount')
-        };
+        // Создаем сегменты
+        function createSegments() {
+            const wheel = document.getElementById('wheel');
+            const segmentAngle = 360 / prizes.length;
 
-        // Инициализация рулетки
-        function initializeWheel() {
-            createWheelSegments();
-            updateSpinCount();
-        }
-
-        // Создание сегментов рулетки с правильным позиционированием цифр
-        function createWheelSegments() {
-            elements.wheel.innerHTML = '';
-            const segmentAngle = 360 / CONFIG.prizes.length;
-
-            CONFIG.prizes.forEach((prize, index) => {
+            prizes.forEach((prize, index) => {
                 const segment = document.createElement('div');
                 segment.className = 'segment';
                 segment.style.transform = `rotate(${index * segmentAngle}deg)`;
-                segment.style.background = CONFIG.colors[index];
-
-                const content = document.createElement('div');
-                content.className = 'segment-content';
-                content.textContent = prize;
                 
-                // Поворачиваем цифры чтобы они были вертикально в своих секторах
-                // и корректируем позиционирование
-                const contentRotation = segmentAngle / 2;
-                content.style.transform = `rotate(${contentRotation}deg)`;
+                const span = document.createElement('span');
+                span.textContent = prize;
+                span.style.transform = `rotate(${segmentAngle / 2}deg)`;
                 
-                segment.appendChild(content);
-                elements.wheel.appendChild(segment);
+                segment.appendChild(span);
+                wheel.appendChild(segment);
             });
         }
 
-        // Вращение рулетки
+        // Вращение с физикой как на WheelOfNames
         function spinWheel() {
-            if (state.isSpinning) return;
+            if (isSpinning) return;
 
-            state.isSpinning = true;
-            elements.spinButton.disabled = true;
-            elements.result.innerHTML = 'Крутим... 🌀';
+            isSpinning = true;
+            document.getElementById('spinButton').disabled = true;
+            document.getElementById('result').textContent = 'Крутим...';
 
-            // Сброс анимации
-            elements.wheel.style.transition = 'none';
-            elements.wheel.style.transform = `rotate(${state.currentRotation % 360}deg)`;
+            const wheel = document.getElementById('wheel');
+            const randomPrizeIndex = Math.floor(Math.random() * prizes.length);
+            const segmentAngle = 360 / prizes.length;
+            
+            // Физика как у них: много оборотов + плавное замедление
+            const fullRotations = 6 + Math.random() * 4;
+            const targetAngle = 360 * fullRotations + (randomPrizeIndex * segmentAngle);
 
-            // Запуск новой анимации
+            wheel.style.transition = 'transform 5s cubic-bezier(0.17, 0.67, 0.12, 0.99)';
+            wheel.style.transform = `rotate(${targetAngle}deg)`;
+
             setTimeout(() => {
-                const randomPrizeIndex = Math.floor(Math.random() * CONFIG.prizes.length);
-                const segmentAngle = 360 / CONFIG.prizes.length;
-                const extraRotation = Math.random() * segmentAngle;
-                const fullRotations = CONFIG.minRotations + Math.random() * (CONFIG.maxRotations - CONFIG.minRotations);
-                const targetAngle = state.currentRotation + (fullRotations * 360) + (randomPrizeIndex * segmentAngle) + extraRotation;
+                const wonPrize = prizes[randomPrizeIndex];
+                document.getElementById('result').innerHTML = 
+                    `🎉 Поздравляем!<br><div class="prize-amount">${wonPrize}</div>`;
+                isSpinning = false;
+                document.getElementById('spinButton').disabled = false;
 
-                elements.wheel.style.transition = `transform ${CONFIG.spinDuration}ms cubic-bezier(0.2, 0.8, 0.3, 1)`;
-                elements.wheel.style.transform = `rotate(${targetAngle}deg)`;
-
-                state.currentRotation = targetAngle;
-
-                setTimeout(() => {
-                    showResult(CONFIG.prizes[randomPrizeIndex]);
-                }, CONFIG.spinDuration);
-
-            }, 50);
-        }
-
-        // Показ результата
-        function showResult(prize) {
-            state.isSpinning = false;
-            state.spinCount++;
-            
-            elements.spinButton.disabled = false;
-            elements.result.innerHTML = `
-                🎉 Поздравляем! 
-                <div class="prize-amount">${prize}</div>
-                Ваш выигрыш!
-            `;
-            elements.result.classList.add('celebrate');
-            
-            updateSpinCount();
-            createConfetti();
-            
-            // Отправка данных в Telegram бота
-            sendToTelegram(prize);
-            
-            setTimeout(() => {
-                elements.result.classList.remove('celebrate');
-            }, 1500);
-        }
-
-        // Обновление счетчика вращений
-        function updateSpinCount() {
-            elements.spinCount.textContent = `Сделано вращений: ${state.spinCount}`;
-        }
-
-        // Создание конфетти
-        function createConfetti() {
-            const confettiCount = 100;
-            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
-            
-            for (let i = 0; i < confettiCount; i++) {
-                setTimeout(() => {
-                    const confetti = document.createElement('div');
-                    confetti.className = 'confetti';
-                    confetti.style.left = Math.random() * 100 + 'vw';
-                    confetti.style.top = '-20px';
-                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
-                    confetti.style.opacity = '1';
-                    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0%';
-                    document.body.appendChild(confetti);
-
-                    const animation = confetti.animate([
-                        { 
-                            transform: `translateY(0px) rotate(0deg) translateX(0px)`, 
-                            opacity: 1 
-                        },
-                        { 
-                            transform: `translateY(100vh) rotate(${Math.random() * 720}deg) translateX(${Math.random() * 200 - 100}px)`, 
-                            opacity: 0 
-                        }
-                    ], {
-                        duration: 2000 + Math.random() * 2000,
-                        easing: 'cubic-bezier(0.1, 0.8, 0.3, 1)'
-                    });
-
-                    animation.onfinish = () => confetti.remove();
-                }, i * 30);
-            }
-        }
-
-        // Отправка данных в Telegram
-        function sendToTelegram(prize) {
-            if (window.Telegram && Telegram.WebApp) {
-                try {
+                // Отправка в Telegram
+                if (window.Telegram && Telegram.WebApp) {
                     Telegram.WebApp.sendData(JSON.stringify({
-                        action: 'spin_result',
-                        prize: prize,
-                        spin_count: state.spinCount,
-                        user_id: Telegram.WebApp.initDataUnsafe.user?.id,
-                        timestamp: new Date().toISOString()
+                        prize: wonPrize,
+                        user_id: Telegram.WebApp.initDataUnsafe.user?.id
                     }));
-                } catch (error) {
-                    console.log('Telegram WebApp not available:', error);
                 }
-            }
+            }, 5000);
         }
 
-        // Инициализация при загрузке
-        document.addEventListener('DOMContentLoaded', initializeWheel);
+        // Запуск
+        document.addEventListener('DOMContentLoaded', createSegments);
     </script>
 </body>
 </html>
