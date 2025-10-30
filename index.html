@@ -90,8 +90,8 @@
         const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57',
                        '#FF9FF3', '#54A0FF', '#5F27CD', '#00D2D3', '#FF9F43'];
         
-        let currentRotation = 0;
         let isSpinning = false;
+        let targetPrizeIndex = 0;
 
         // Рисуем рулетку
         function drawWheel(rotation = 0) {
@@ -160,15 +160,17 @@
             isSpinning = true;
             document.getElementById('result').textContent = 'Крутим...';
             
-            const randomPrizeIndex = Math.floor(Math.random() * prizes.length);
+            // ПРОСТОЙ ПОДХОД: сразу выбираем приз
+            targetPrizeIndex = Math.floor(Math.random() * prizes.length);
             const segmentAngle = (2 * Math.PI) / prizes.length;
             
-            // Вращение: 5-8 полных оборотов + выигрышный сегмент
-            const fullRotations = 5 + Math.random() * 3;
-            const targetRotation = currentRotation + (fullRotations * Math.PI * 2) + (randomPrizeIndex * segmentAngle);
+            // Вращение: 5 полных оборотов + выигрышный сегмент
+            const fullRotations = 5;
+            const targetRotation = fullRotations * Math.PI * 2 + (targetPrizeIndex * segmentAngle);
             
+            let startRotation = 0;
             const startTime = performance.now();
-            const duration = 4000;
+            const duration = 3000;
             
             function animate(currentTime) {
                 const elapsed = currentTime - startTime;
@@ -176,27 +178,22 @@
                 
                 // Плавное замедление
                 const easeOut = 1 - Math.pow(1 - progress, 3);
-                currentRotation = easeOut * targetRotation;
+                const currentRotation = easeOut * targetRotation;
                 
                 drawWheel(currentRotation);
                 
                 if (progress < 1) {
                     requestAnimationFrame(animate);
                 } else {
-                    // ПРАВИЛЬНО вычисляем выигрышный сегмент
-                    const normalizedRotation = currentRotation % (Math.PI * 2);
-                    // Стрелка вверху (0°), поэтому вычитаем из полного круга
-                    const pointerAngle = (2 * Math.PI - normalizedRotation) % (2 * Math.PI);
-                    const winningIndex = Math.floor(pointerAngle / segmentAngle) % prizes.length;
-                    
+                    // ПРОСТО: используем заранее выбранный приз
                     isSpinning = false;
                     document.getElementById('result').textContent = 
-                        `🎉 Вы выиграли: ${prizes[winningIndex]}!`;
+                        `🎉 Вы выиграли: ${prizes[targetPrizeIndex]}!`;
                         
                     // Отправка в Telegram
                     if (window.Telegram && Telegram.WebApp) {
                         Telegram.WebApp.sendData(JSON.stringify({
-                            prize: prizes[winningIndex],
+                            prize: prizes[targetPrizeIndex],
                             user_id: Telegram.WebApp.initDataUnsafe.user?.id
                         }));
                     }
