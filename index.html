@@ -49,7 +49,7 @@
             background: linear-gradient(45deg, #800020, #ff1493);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 
+            text-shadow:
                 2px 2px 0 #000,
                 -2px -2px 0 #000,
                 2px -2px 0 #000,
@@ -92,7 +92,7 @@
     <script>
         const canvas = document.getElementById('wheelCanvas');
         const ctx = canvas.getContext('2d');
-        const prizes = ["100 РУБ", "200 РУБ", "300 РУБ", "400 РУБ", "500 РУБ", 
+        const prizes = ["100 РУБ", "200 РУБ", "300 РУБ", "400 РУБ", "500 РУБ",
                        "600 РУБ", "700 РУБ", "800 РУБ", "900 РУБ", "1000 РУБ"];
         const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57',
                        '#FF9FF3', '#54A0FF', '#5F27CD', '#00D2D3', '#FF9F43'];
@@ -116,6 +116,7 @@
                 const startAngle = i * segmentAngle;
                 const endAngle = (i + 1) * segmentAngle;
                 
+                // Отрисовка сектора
                 ctx.beginPath();
                 ctx.moveTo(centerX, centerY);
                 ctx.arc(centerX, centerY, radius, startAngle, endAngle);
@@ -127,16 +128,24 @@
                 ctx.lineWidth = 2;
                 ctx.stroke();
                 
+                // Отрисовка текста (центрированный)
                 ctx.save();
                 ctx.translate(centerX, centerY);
                 ctx.rotate(startAngle + segmentAngle / 2);
-                ctx.textAlign = 'right';
+                
+                const text = prizes[i];
+                const textMetrics = ctx.measureText(text);
+                const textWidth = textMetrics.width;
+                
+                ctx.textAlign = 'center';
                 ctx.fillStyle = '#000';
                 ctx.font = 'bold 16px Arial';
-                ctx.fillText(prizes[i], radius - 20, 5);
+                ctx.fillText(text, radius - 30, 0);
+                
                 ctx.restore();
             }
             
+            // Центр колеса
             ctx.beginPath();
             ctx.arc(centerX, centerY, 20, 0, 2 * Math.PI);
             ctx.fillStyle = 'white';
@@ -156,24 +165,24 @@
             
             const segmentAngle = (2 * Math.PI) / prizes.length;
 
-            // 1. ВЫБИРАЕМ сектор, который должен оказаться под стрелкой
+            // Выбираем случайный сектор, который должен оказаться под стрелкой
             const winningIndex = Math.floor(Math.random() * prizes.length);
 
-            // 2. РАССЧИТЫВАЕМ поворот так, чтобы этот сектор оказался ПОД СТРЕЛКОЙ
-            // Стрелка сверху (0°), поэтому:
-            const targetRotation = - (winningIndex * segmentAngle) - (segmentAngle / 2);
+            // Рассчитываем поворот так, чтобы центр выбранного сектора был под стрелкой
+            const targetRotation = -(winningIndex * segmentAngle) - (segmentAngle / 2);
 
-            // 3. Добавляем полные обороты для красоты
+            // Добавляем 5 полных оборотов для эффектности
             const fullRotations = 5 * 2 * Math.PI;
             const finalRotation = fullRotations + targetRotation;
             
             const startTime = performance.now();
-            const duration = 3000;
-            
+            const duration = 3000; // 3 секунды вращения
+
             function animate(currentTime) {
                 const elapsed = currentTime - startTime;
                 const progress = Math.min(elapsed / duration, 1);
                 
+                // Плавное замедление (ease-out)
                 const easeOut = 1 - Math.pow(1 - progress, 3);
                 const currentRotation = easeOut * finalRotation;
                 
@@ -183,9 +192,9 @@
                     requestAnimationFrame(animate);
                 } else {
                     isSpinning = false;
-                    document.getElementById('result').textContent = 
+                    document.getElementById('result').textContent =
                         `🎉 Вы выиграли: ${prizes[winningIndex]}!`;
-                        
+                    
                     if (window.Telegram && Telegram.WebApp) {
                         Telegram.WebApp.sendData(JSON.stringify({
                             prize: prizes[winningIndex],
@@ -198,7 +207,7 @@
             requestAnimationFrame(animate);
         }
 
-        // Запуск
+        // Инициализация
         drawWheel();
     </script>
 </body>
