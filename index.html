@@ -3,205 +3,470 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>girly spin</title>
+    <title>girly spin - Final Working Version</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            background: pink;
-            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #ffb6c1, #ff69b4, #ff1493);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            font-family: 'Arial', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            margin: 0;
+            padding: 20px;
         }
-        
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         .container {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
-        
-        h1 {
+
+        .title {
             color: #ff1493;
-            margin-bottom: 20px;
+            font-size: 36px;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            font-weight: bold;
         }
-        
+
+        .wheel-section {
+            position: relative;
+            margin: 40px 0;
+        }
+
         .wheel-container {
             position: relative;
-            margin: 20px auto;
             width: 400px;
             height: 400px;
+            margin: 0 auto;
         }
-        
+
         #wheelCanvas {
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
-            box-shadow: 0 0 0 8px #ff1493;
+            box-shadow: 0 0 0 10px #ff1493, 0 15px 35px rgba(0,0,0,0.3);
         }
-        
-        /* Стрелка наверху */
+
         .pointer {
             position: absolute;
             top: -40px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 40px;
-            background: linear-gradient(45deg, #800020, #ff1493);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 
-                2px 2px 0 #000,
-                -2px -2px 0 #000,
-                2px -2px 0 #000,
-                -2px 2px 0 #000,
-                0px 2px 0 #000,
-                0px -2px 0 #000,
-                2px 0px 0 #000,
-                -2px 0px 0 #000;
             z-index: 10;
+            width: 50px;
+            height: 60px;
+        }
+
+        .pointer-svg {
+            width: 100%;
+            height: 100%;
             filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
         }
-        
-        button {
-            background: #ff1493;
+
+        .spin-button {
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
             color: white;
             border: none;
-            padding: 15px 30px;
-            font-size: 18px;
-            border-radius: 25px;
-            cursor: pointer;
-            margin: 15px 0;
-        }
-        
-        .result {
+            padding: 20px 50px;
             font-size: 20px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 25px 0;
+            box-shadow: 0 10px 25px rgba(255, 20, 147, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .spin-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(255, 20, 147, 0.4);
+        }
+
+        .spin-button:active {
+            transform: translateY(1px);
+        }
+
+        .spin-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result {
+            font-size: 24px;
             color: #ff1493;
             font-weight: bold;
-            margin: 15px 0;
+            margin: 25px 0;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .prize-amount {
+            font-size: 42px;
+            color: #ff1493;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .confetti {
+            position: fixed;
+            width: 12px;
+            height: 12px;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .spin-count {
+            font-size: 14px;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        @keyframes celebrate {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .celebrate {
+            animation: celebrate 0.5s ease-in-out 3;
+        }
+
+        .debug-info {
+            font-size: 12px;
+            color: #888;
+            margin-top: 10px;
+            font-family: monospace;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>girly spin💞</h1>
+        <h1 class="title">girly spin💞</h1>
         
-        <div class="wheel-container">
-            <div class="pointer">⬇</div>
-            <canvas id="wheelCanvas" width="400" height="400"></canvas>
+        <div class="wheel-section">
+            <div class="wheel-container">
+                <div class="pointer">
+                    <svg class="pointer-svg" viewBox="0 0 100 100">
+                        <path d="M50 10 L60 60 L40 60 Z" fill="#800020" stroke="#000" stroke-width="3"/>
+                        <circle cx="50" cy="65" r="8" fill="#800020" stroke="#000" stroke-width="2"/>
+                    </svg>
+                </div>
+                <canvas id="wheelCanvas" width="400" height="400"></canvas>
+            </div>
         </div>
-        
-        <button onclick="startSpin()">Крутить барабан!</button>
-        <div class="result" id="result">Нажмите кнопку!</div>
+
+        <button class="spin-button" id="spinButton" onclick="startSpin()">
+            Крутить барабан! 💫
+        </button>
+
+        <div class="result" id="result">
+            Нажмите кнопку чтобы начать! 🎰
+        </div>
+
+        <div class="spin-count" id="spinCount">
+            Сделано вращений: 0
+        </div>
+
+        <div class="debug-info" id="debugInfo">
+            <!-- Debug информация -->
+        </div>
     </div>
 
     <script>
-        const canvas = document.getElementById('wheelCanvas');
-        const ctx = canvas.getContext('2d');
-        const prizes = ["100 РУБ", "200 РУБ", "300 РУБ", "400 РУБ", "500 РУБ", 
-                       "600 РУБ", "700 РУБ", "800 РУБ", "900 РУБ", "1000 РУБ"];
-        const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57',
-                       '#FF9FF3', '#54A0FF', '#5F27CD', '#00D2D3', '#FF9F43'];
-        
-        let isSpinning = false;
+        // === КОНФИГУРАЦИЯ ===
+        const CONFIG = {
+            prizes: ["100 РУБ", "200 РУБ", "300 РУБ", "400 РУБ", "500 РУБ", 
+                    "600 РУБ", "700 РУБ", "800 РУБ", "900 РУБ", "1000 РУБ"],
+            colors: ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', 
+                    '#ff9ff3', '#54a0ff', '#5f27cd', '#00d2d3', '#ff9f43'],
+            spinDuration: 4000,
+            minRotations: 5,
+            maxRotations: 8,
+            pointerPosition: 'top' // top, right, bottom
+        };
 
-        function drawWheel(rotation = 0) {
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
-            const radius = canvas.width / 2 - 10;
-            const segmentAngle = (2 * Math.PI) / prizes.length;
-            
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            ctx.save();
-            ctx.translate(centerX, centerY);
-            ctx.rotate(rotation);
-            ctx.translate(-centerX, -centerY);
-            
-            for (let i = 0; i < prizes.length; i++) {
-                const startAngle = i * segmentAngle;
-                const endAngle = (i + 1) * segmentAngle;
-                
-                ctx.beginPath();
-                ctx.moveTo(centerX, centerY);
-                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
-                ctx.closePath();
-                ctx.fillStyle = colors[i];
-                ctx.fill();
-                
-                ctx.strokeStyle = '#000';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-                
-                ctx.save();
-                ctx.translate(centerX, centerY);
-                ctx.rotate(startAngle + segmentAngle / 2);
-                ctx.textAlign = 'right';
-                ctx.fillStyle = '#000';
-                ctx.font = 'bold 16px Arial';
-                ctx.fillText(prizes[i], radius - 20, 5);
-                ctx.restore();
-            }
-            
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, 20, 0, 2 * Math.PI);
-            ctx.fillStyle = 'white';
-            ctx.fill();
-            ctx.strokeStyle = '#ff1493';
-            ctx.lineWidth = 3;
-            ctx.stroke();
-            
-            ctx.restore();
+        // === СОСТОЯНИЕ ===
+        let state = {
+            isSpinning: false,
+            spinCount: 0,
+            currentRotation: 0,
+            lastWinningIndex: -1
+        };
+
+        // === ЭЛЕМЕНТЫ DOM ===
+        const elements = {
+            wheel: document.getElementById('wheelCanvas'),
+            spinButton: document.getElementById('spinButton'),
+            result: document.getElementById('result'),
+            spinCount: document.getElementById('spinCount'),
+            debugInfo: document.getElementById('debugInfo')
+        };
+
+        const ctx = elements.wheel.getContext('2d');
+
+        // === ИНИЦИАЛИЗАЦИЯ РУЛЕТКИ ===
+        function initializeWheel() {
+            drawWheel();
+            updateSpinCount();
+            updateDebugInfo('Рулетка инициализирована');
         }
 
+        // === ОСНОВНАЯ ЛОГИКА ВРАЩЕНИЯ ===
         function startSpin() {
-            if (isSpinning) return;
+            if (state.isSpinning) return;
+
+            state.isSpinning = true;
+            elements.spinButton.disabled = true;
+            elements.result.innerHTML = 'Крутим... 🌀';
+            updateDebugInfo('Начало вращения...');
+
+            // Выбираем случайный приз
+            const winningIndex = Math.floor(Math.random() * CONFIG.prizes.length);
+            state.lastWinningIndex = winningIndex;
+            const segmentAngle = (2 * Math.PI) / CONFIG.prizes.length;
             
-            isSpinning = true;
-            document.getElementById('result').textContent = 'Крутим...';
+            updateDebugInfo(`Выбран приз: ${CONFIG.prizes[winningIndex]} (индекс: ${winningIndex})`);
             
-            const winningIndex = Math.floor(Math.random() * prizes.length);
-            const segmentAngle = (2 * Math.PI) / prizes.length;
-            
-            // ПРОСТО: число должно оказаться прямо под стрелкой (сверху)
-            const randomOffset = Math.random() * segmentAngle;
-            const targetRotation = - (winningIndex * segmentAngle + randomOffset);
-            
-            const fullRotations = 5 * 2 * Math.PI;
-            const finalRotation = fullRotations + targetRotation;
-            
+            // Вычисляем целевой угол вращения (стрелка сверху = 0°)
+            const fullRotations = CONFIG.minRotations + Math.random() * (CONFIG.maxRotations - CONFIG.minRotations);
+            const randomOffset = Math.random() * segmentAngle; // Случайное место в сегменте
+            const targetRotation = state.currentRotation + (fullRotations * 2 * Math.PI) + (winningIndex * segmentAngle) + randomOffset;
+
+            updateDebugInfo(`Целевое вращение: ${(targetRotation * 180 / Math.PI).toFixed(1)}°`);
+
+            // Анимация вращения
+            animateRotation(targetRotation, winningIndex);
+        }
+
+        // === АНИМАЦИЯ ВРАЩЕНИЯ ===
+        function animateRotation(targetRotation, winningIndex) {
+            const startRotation = state.currentRotation;
             const startTime = performance.now();
-            const duration = 3000;
-            
+            const duration = CONFIG.spinDuration;
+
             function animate(currentTime) {
                 const elapsed = currentTime - startTime;
                 const progress = Math.min(elapsed / duration, 1);
                 
-                const easeOut = 1 - Math.pow(1 - progress, 3);
-                const currentRotation = easeOut * finalRotation;
+                // Плавное замедление с bounce эффектом
+                let easeOut;
+                if (progress < 0.8) {
+                    easeOut = 1 - Math.pow(1 - progress, 3);
+                } else {
+                    // Замедление в конце
+                    const remaining = (progress - 0.8) / 0.2;
+                    easeOut = 0.8 + (0.2 * (1 - Math.pow(1 - remaining, 4)));
+                }
                 
-                drawWheel(currentRotation);
+                state.currentRotation = startRotation + (targetRotation - startRotation) * easeOut;
+                
+                drawWheel(state.currentRotation);
                 
                 if (progress < 1) {
                     requestAnimationFrame(animate);
                 } else {
-                    isSpinning = false;
-                    document.getElementById('result').textContent = 
-                        `🎉 Вы выиграли: ${prizes[winningIndex]}!`;
-                        
-                    if (window.Telegram && Telegram.WebApp) {
-                        Telegram.WebApp.sendData(JSON.stringify({
-                            prize: prizes[winningIndex],
-                            user_id: Telegram.WebApp.initDataUnsafe.user?.id
-                        }));
-                    }
+                    // Завершение анимации
+                    finishSpin(winningIndex);
                 }
             }
             
             requestAnimationFrame(animate);
         }
 
-        drawWheel();
+        // === ЗАВЕРШЕНИЕ ВРАЩЕНИЯ ===
+        function finishSpin(prizeIndex) {
+            state.isSpinning = false;
+            state.spinCount++;
+            
+            elements.spinButton.disabled = false;
+            elements.result.innerHTML = `
+                🎉 Поздравляем! 
+                <div class="prize-amount">${CONFIG.prizes[prizeIndex]}</div>
+                Ваш выигрыш!
+            `;
+            elements.result.classList.add('celebrate');
+            
+            updateSpinCount();
+            createConfetti();
+            sendToTelegram(CONFIG.prizes[prizeIndex]);
+            updateDebugInfo(`Вращение завершено! Выигрыш: ${CONFIG.prizes[prizeIndex]}`);
+            
+            setTimeout(() => {
+                elements.result.classList.remove('celebrate');
+            }, 1500);
+        }
+
+        // === ОТРИСОВКА CANVAS ===
+        function drawWheel(rotation = 0) {
+            const centerX = elements.wheel.width / 2;
+            const centerY = elements.wheel.height / 2;
+            const radius = elements.wheel.width / 2 - 15;
+            const segmentAngle = (2 * Math.PI) / CONFIG.prizes.length;
+            
+            ctx.clearRect(0, 0, elements.wheel.width, elements.wheel.height);
+            
+            // Применяем вращение
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(rotation);
+            ctx.translate(-centerX, -centerY);
+            
+            // Рисуем сегменты
+            for (let i = 0; i < CONFIG.prizes.length; i++) {
+                const startAngle = i * segmentAngle;
+                const endAngle = (i + 1) * segmentAngle;
+                
+                // Сегмент
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                ctx.closePath();
+                ctx.fillStyle = CONFIG.colors[i];
+                ctx.fill();
+                
+                // Граница сегмента
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                // Текст
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(startAngle + segmentAngle / 2);
+                ctx.textAlign = 'right';
+                ctx.fillStyle = '#000';
+                ctx.font = 'bold 14px Arial';
+                ctx.fillText(CONFIG.prizes[i], radius - 25, 5);
+                ctx.restore();
+            }
+            
+            // Центральный круг
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 25, 0, 2 * Math.PI);
+            ctx.fillStyle = 'white';
+            ctx.fill();
+            ctx.strokeStyle = '#ff1493';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+            
+            ctx.restore();
+        }
+
+        // === ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ===
+        function updateSpinCount() {
+            elements.spinCount.textContent = `Сделано вращений: ${state.spinCount}`;
+        }
+
+        function updateDebugInfo(message) {
+            elements.debugInfo.textContent = message;
+        }
+
+        function createConfetti() {
+            const confettiCount = 150;
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+            
+            for (let i = 0; i < confettiCount; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.top = '-20px';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.opacity = '1';
+                    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0%';
+                    confetti.style.transform = `scale(${0.5 + Math.random()})`;
+                    document.body.appendChild(confetti);
+
+                    const animation = confetti.animate([
+                        { 
+                            transform: `translateY(0px) rotate(0deg) translateX(${Math.random() * 100 - 50}px)`, 
+                            opacity: 1 
+                        },
+                        { 
+                            transform: `translateY(100vh) rotate(${Math.random() * 720}deg) translateX(${Math.random() * 200 - 100}px)`, 
+                            opacity: 0 
+                        }
+                    ], {
+                        duration: 2000 + Math.random() * 2000,
+                        easing: 'cubic-bezier(0.1, 0.8, 0.3, 1)'
+                    });
+
+                    animation.onfinish = () => confetti.remove();
+                }, i * 20);
+            }
+        }
+
+        function sendToTelegram(prize) {
+            if (window.Telegram && Telegram.WebApp) {
+                try {
+                    Telegram.WebApp.sendData(JSON.stringify({
+                        action: 'spin_result',
+                        prize: prize,
+                        spin_count: state.spinCount,
+                        user_id: Telegram.WebApp.initDataUnsafe.user?.id,
+                        timestamp: new Date().toISOString(),
+                        debug: {
+                            rotation: state.currentRotation,
+                            winning_index: state.lastWinningIndex
+                        }
+                    }));
+                } catch (error) {
+                    console.log('Telegram WebApp not available:', error);
+                }
+            }
+        }
+
+        // === ЗАПУСК ===
+        document.addEventListener('DOMContentLoaded', initializeWheel);
+
+        // === ДОПОЛНИТЕЛЬНЫЕ ФУНКЦИИ ===
+        function testSpecificPrize(index) {
+            if (state.isSpinning) return;
+            state.isSpinning = true;
+            elements.spinButton.disabled = true;
+            elements.result.innerHTML = `Тестируем: ${CONFIG.prizes[index]}...`;
+            
+            const segmentAngle = (2 * Math.PI) / CONFIG.prizes.length;
+            const fullRotations = 3;
+            const targetRotation = state.currentRotation + (fullRotations * 2 * Math.PI) + (index * segmentAngle);
+            
+            animateRotation(targetRotation, index);
+        }
+
+        // Глобальные функции для тестирования
+        window.test100 = () => testSpecificPrize(0);
+        window.test500 = () => testSpecificPrize(4);
+        window.test1000 = () => testSpecificPrize(9);
+
+        console.log('🎰 girly spin загружен!');
+        console.log('Для теста используйте: test100(), test500(), test1000()');
     </script>
 </body>
 </html>
