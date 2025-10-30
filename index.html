@@ -159,9 +159,9 @@
             const winningIndex = Math.floor(Math.random() * prizes.length);
             const segmentAngle = (2 * Math.PI) / prizes.length;
             
-            // Стрелка справа = 90 градусов
-            // Чтобы выигрышный сегмент оказался у стрелки, он должен быть в позиции 90°
-            const targetRotation = - (winningIndex * segmentAngle) + (Math.PI / 2);
+            // Просто крутим к случайному месту в выигрышном сегменте
+            const randomOffset = Math.random() * segmentAngle; // Случайное место в сегменте
+            const targetRotation = - (winningIndex * segmentAngle + randomOffset) + (Math.PI / 2);
             
             // Добавляем обороты
             const fullRotations = 5 * 2 * Math.PI;
