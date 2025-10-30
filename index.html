@@ -159,7 +159,7 @@
             const segmentAngle = (2 * Math.PI) / prizes.length;
             
             // Простая логика: число под стрелкой = выигрыш
-            const targetRotation = - (winningIndex * segmentAngle) + (segmentAngle / 2);
+            const targetRotation = - (winningIndex * segmentAngle);
             
             // Добавляем 5 полных оборотов
             const fullRotations = 5 * 2 * Math.PI;
