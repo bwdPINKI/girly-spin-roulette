@@ -46,14 +46,8 @@
             left: 50%;
             transform: translateX(-50%);
             font-size: 40px;
-            background: linear-gradient(45deg, #800020, #ff1493);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow:
-                2px 2px 0 #000,
-                -2px -2px 0 #000,
-                2px -2px 0 #000,
-                -2px 2px 0 #000;
+            color: #ff1493;
+            text-shadow: 2px 2px 3px rgba(0,0,0,0.5);
             z-index: 10;
         }
         
@@ -81,7 +75,7 @@
         <h1>girly spin💞</h1>
         
         <div class="wheel-container">
-            <div class="pointer">⬇</div>
+            <div class="pointer">◄</div>
             <canvas id="wheelCanvas" width="400" height="400"></canvas>
         </div>
         
@@ -102,49 +96,47 @@
         function drawWheel(rotation = 0) {
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
-            const radius = canvas.width / 2 - 10;
+            const radius = canvas.width / 2 - 20;
             const segmentAngle = (2 * Math.PI) / prizes.length;
-            
+
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
+
             ctx.save();
             ctx.translate(centerX, centerY);
             ctx.rotate(rotation);
             ctx.translate(-centerX, -centerY);
-            
+
             for (let i = 0; i < prizes.length; i++) {
                 const startAngle = i * segmentAngle;
                 const endAngle = (i + 1) * segmentAngle;
-                
-                // Отрисовка сектора
+
+
+                // Сектор
                 ctx.beginPath();
                 ctx.moveTo(centerX, centerY);
                 ctx.arc(centerX, centerY, radius, startAngle, endAngle);
                 ctx.closePath();
                 ctx.fillStyle = colors[i];
                 ctx.fill();
-                
-                ctx.strokeStyle = '#000';
+                ctx.strokeStyle = '#fff';
                 ctx.lineWidth = 2;
                 ctx.stroke();
-                
-                // Отрисовка текста (центрированный)
+
+                // Текст в секторе
                 ctx.save();
                 ctx.translate(centerX, centerY);
                 ctx.rotate(startAngle + segmentAngle / 2);
                 
-                const text = prizes[i];
-                const textMetrics = ctx.measureText(text);
-                const textWidth = textMetrics.width;
-                
                 ctx.textAlign = 'center';
-                ctx.fillStyle = '#000';
+                ctx.textBaseline = 'middle';
                 ctx.font = 'bold 16px Arial';
-                ctx.fillText(text, radius - 30, 0);
+                ctx.fillStyle = '#fff';
+                ctx.fillText(prizes[i], radius * 0.7, 0);
                 
                 ctx.restore();
             }
-            
+
             // Центр колеса
             ctx.beginPath();
             ctx.arc(centerX, centerY, 20, 0, 2 * Math.PI);
@@ -153,41 +145,44 @@
             ctx.strokeStyle = '#ff1493';
             ctx.lineWidth = 3;
             ctx.stroke();
-            
+
             ctx.restore();
         }
 
         function startSpin() {
             if (isSpinning) return;
-            
+
             isSpinning = true;
             document.getElementById('result').textContent = 'Крутим...';
-            
+
             const segmentAngle = (2 * Math.PI) / prizes.length;
-
-            // Выбираем случайный сектор, который должен оказаться под стрелкой
-            const winningIndex = Math.floor(Math.random() * prizes.length);
-
-            // Рассчитываем поворот так, чтобы центр выбранного сектора был под стрелкой
-            const targetRotation = -(winningIndex * segmentAngle) - (segmentAngle / 2);
-
-            // Добавляем 5 полных оборотов для эффектности
-            const fullRotations = 5 * 2 * Math.PI;
-            const finalRotation = fullRotations + targetRotation;
             
+            // Случайный индекс приза
+            const winningIndex = Math.floor(Math.random() * prizes.length);
+            
+            // Рассчитываем финальный угол так, чтобы сектор остановился точно под стрелкой
+            // 1. Полный оборот (5 раз)
+            const fullRotations = 5 * 2 * Math.PI;
+            // 2. Угол, чтобы нужный сектор был сверху
+            const targetRotation = -(winningIndex * segmentAngle);
+            // 3. Смещение на половину сектора для центровки
+            const offset = -segmentAngle / 2;
+            
+            const finalRotation = fullRotations + targetRotation + offset;
+
             const startTime = performance.now();
-            const duration = 3000; // 3 секунды вращения
+            const duration = 4000; // 4 секунды
 
             function animate(currentTime) {
                 const elapsed = currentTime - startTime;
                 const progress = Math.min(elapsed / duration, 1);
-                
+
                 // Плавное замедление (ease-out)
                 const easeOut = 1 - Math.pow(1 - progress, 3);
                 const currentRotation = easeOut * finalRotation;
-                
+
                 drawWheel(currentRotation);
-                
+
                 if (progress < 1) {
                     requestAnimationFrame(animate);
                 } else {
@@ -203,7 +198,7 @@
                     }
                 }
             }
-            
+
             requestAnimationFrame(animate);
         }
 
