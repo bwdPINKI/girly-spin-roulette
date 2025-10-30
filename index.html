@@ -96,112 +96,25 @@
     </div>
 
     <script>
-        const canvas = document.getElementById('wheelCanvas');
-        const ctx = canvas.getContext('2d');
-        const prizes = ["100 РУБ", "200 РУБ", "300 РУБ", "400 РУБ", "500 РУБ", 
-                       "600 РУБ", "700 РУБ", "800 РУБ", "900 РУБ", "1000 РУБ"];
-        const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57',
-                       '#FF9FF3', '#54A0FF', '#5F27CD', '#00D2D3', '#FF9F43'];
-        
-        let isSpinning = false;
-
-        function drawWheel(rotation = 0) {
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
-            const radius = canvas.width / 2 - 10;
-            const segmentAngle = (2 * Math.PI) / prizes.length;
-            
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            ctx.save();
-            ctx.translate(centerX, centerY);
-            ctx.rotate(rotation);
-            ctx.translate(-centerX, -centerY);
-            
-            for (let i = 0; i < prizes.length; i++) {
-                const startAngle = i * segmentAngle;
-                const endAngle = (i + 1) * segmentAngle;
-                
-                ctx.beginPath();
-                ctx.moveTo(centerX, centerY);
-                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
-                ctx.closePath();
-                ctx.fillStyle = colors[i];
-                ctx.fill();
-                
-                ctx.strokeStyle = '#000';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-                
-                ctx.save();
-                ctx.translate(centerX, centerY);
-                ctx.rotate(startAngle + segmentAngle / 2);
-                ctx.textAlign = 'right';
-                ctx.fillStyle = '#000';
-                ctx.font = 'bold 16px Arial';
-                ctx.fillText(prizes[i], radius - 20, 5);
-                ctx.restore();
-            }
-            
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, 20, 0, 2 * Math.PI);
-            ctx.fillStyle = 'white';
-            ctx.fill();
-            ctx.strokeStyle = '#ff1493';
-            ctx.lineWidth = 3;
-            ctx.stroke();
-            
-            ctx.restore();
-        }
-
-        function startSpin() {
-            if (isSpinning) return;
-            
-            isSpinning = true;
-            document.getElementById('result').textContent = 'Крутим...';
-            
-            const winningIndex = Math.floor(Math.random() * prizes.length);
-            const segmentAngle = (2 * Math.PI) / prizes.length;
-            
-            // Стрелка наверху = 0 градусов
-            const randomOffset = Math.random() * segmentAngle;
-            const targetRotation = - (winningIndex * segmentAngle + randomOffset);
-            
-            const fullRotations = 5 * 2 * Math.PI;
-            const finalRotation = fullRotations + targetRotation;
-            
-            const startTime = performance.now();
-            const duration = 3000;
-            
-            function animate(currentTime) {
-                const elapsed = currentTime - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                
-                const easeOut = 1 - Math.pow(1 - progress, 3);
-                const currentRotation = easeOut * finalRotation;
-                
-                drawWheel(currentRotation);
-                
-                if (progress < 1) {
-                    requestAnimationFrame(animate);
-                } else {
-                    isSpinning = false;
-                    document.getElementById('result').textContent = 
-                        `🎉 Вы выиграли: ${prizes[winningIndex]}!`;
-                        
-                    if (window.Telegram && Telegram.WebApp) {
-                        Telegram.WebApp.sendData(JSON.stringify({
-                            prize: prizes[winningIndex],
-                            user_id: Telegram.WebApp.initDataUnsafe.user?.id
-                        }));
-                    }
-                }
-            }
-            
-            requestAnimationFrame(animate);
-        }
-
-        drawWheel();
-    </script>
+function startSpin() {
+    if (isSpinning) return;
+    
+    isSpinning = true;
+    document.getElementById('result').textContent = 'Крутим...';
+    
+    const winningIndex = Math.floor(Math.random() * prizes.length);
+    const segmentAngle = (2 * Math.PI) / prizes.length;
+    
+    // ПРОСТО: число должно оказаться прямо под стрелкой
+    // Стрелка сверху = 0°, поэтому никакого смещения!
+    const randomOffset = Math.random() * segmentAngle;
+    const targetRotation = - (winningIndex * segmentAngle + randomOffset);
+    
+    const fullRotations = 5 * 2 * Math.PI;
+    const finalRotation = fullRotations + targetRotation;
+    
+    // ... остальной код
+}
+</script>
 </body>
 </html>
