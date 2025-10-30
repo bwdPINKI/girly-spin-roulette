@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>girly spin - Simple Version</title>
+    <title>girly spin</title>
     <style>
         body {
             background: pink;
@@ -40,16 +40,27 @@
             box-shadow: 0 0 0 8px #ff1493;
         }
         
-        /* Простая стрелка справа */
+        /* Стрелка снизу смотрящая вверх */
         .pointer {
             position: absolute;
-            top: 50%;
-            right: -20px;
-            transform: translateY(-50%);
-            font-size: 50px;
-            color: #800020;
-            text-shadow: 2px 2px 0 #000;
+            bottom: -60px; /* Размещаем снизу */
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 100px; /* В 2 раза больше */
+            background: linear-gradient(45deg, #800020, #ff1493); /* Градиент */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 
+                3px 3px 0 #000,
+                -3px -3px 0 #000,
+                3px -3px 0 #000,
+                -3px 3px 0 #000,
+                0px 3px 0 #000,
+                0px -3px 0 #000,
+                3px 0px 0 #000,
+                -3px 0px 0 #000; /* Обводка */
             z-index: 10;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
         }
         
         button {
@@ -76,7 +87,7 @@
         <h1>girly spin💞</h1>
         
         <div class="wheel-container">
-            <div class="pointer">▶</div>
+            <div class="pointer">⬇</div>
             <canvas id="wheelCanvas" width="400" height="400"></canvas>
         </div>
         
@@ -94,7 +105,6 @@
         
         let isSpinning = false;
 
-        // Рисуем рулетку
         function drawWheel(rotation = 0) {
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
@@ -112,7 +122,6 @@
                 const startAngle = i * segmentAngle;
                 const endAngle = (i + 1) * segmentAngle;
                 
-                // Сегмент
                 ctx.beginPath();
                 ctx.moveTo(centerX, centerY);
                 ctx.arc(centerX, centerY, radius, startAngle, endAngle);
@@ -120,12 +129,10 @@
                 ctx.fillStyle = colors[i];
                 ctx.fill();
                 
-                // Граница
                 ctx.strokeStyle = '#000';
                 ctx.lineWidth = 2;
                 ctx.stroke();
                 
-                // Текст
                 ctx.save();
                 ctx.translate(centerX, centerY);
                 ctx.rotate(startAngle + segmentAngle / 2);
@@ -136,7 +143,6 @@
                 ctx.restore();
             }
             
-            // Центр
             ctx.beginPath();
             ctx.arc(centerX, centerY, 20, 0, 2 * Math.PI);
             ctx.fillStyle = 'white';
@@ -148,22 +154,19 @@
             ctx.restore();
         }
 
-        // Вращение
         function startSpin() {
             if (isSpinning) return;
             
             isSpinning = true;
             document.getElementById('result').textContent = 'Крутим...';
             
-            // Выбираем случайный приз
             const winningIndex = Math.floor(Math.random() * prizes.length);
             const segmentAngle = (2 * Math.PI) / prizes.length;
             
-            // Просто крутим к случайному месту в выигрышном сегменте
-            const randomOffset = Math.random() * segmentAngle; // Случайное место в сегменте
-            const targetRotation = - (winningIndex * segmentAngle + randomOffset) + (Math.PI / 2);
+            // Стрелка снизу = 270 градусов (3π/2)
+            const randomOffset = Math.random() * segmentAngle;
+            const targetRotation = - (winningIndex * segmentAngle + randomOffset) + (3 * Math.PI / 2);
             
-            // Добавляем обороты
             const fullRotations = 5 * 2 * Math.PI;
             const finalRotation = fullRotations + targetRotation;
             
@@ -198,7 +201,6 @@
             requestAnimationFrame(animate);
         }
 
-        // Запуск
         drawWheel();
     </script>
 </body>
