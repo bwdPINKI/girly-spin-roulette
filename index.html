@@ -40,25 +40,25 @@
             box-shadow: 0 0 0 8px #ff1493;
         }
         
-        /* Стрелка снизу смотрящая вверх */
+        /* Стрелка наверху */
         .pointer {
             position: absolute;
-            bottom: -60px; /* Размещаем снизу */
+            top: -40px; /* Размещаем сверху */
             left: 50%;
             transform: translateX(-50%);
-            font-size: 100px; /* В 2 раза больше */
-            background: linear-gradient(45deg, #800020, #ff1493); /* Градиент */
+            font-size: 40px; /* В 2.5 раза меньше (100px / 2.5 = 40px) */
+            background: linear-gradient(45deg, #800020, #ff1493);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-shadow: 
-                3px 3px 0 #000,
-                -3px -3px 0 #000,
-                3px -3px 0 #000,
-                -3px 3px 0 #000,
-                0px 3px 0 #000,
-                0px -3px 0 #000,
-                3px 0px 0 #000,
-                -3px 0px 0 #000; /* Обводка */
+                2px 2px 0 #000,
+                -2px -2px 0 #000,
+                2px -2px 0 #000,
+                -2px 2px 0 #000,
+                0px 2px 0 #000,
+                0px -2px 0 #000,
+                2px 0px 0 #000,
+                -2px 0px 0 #000;
             z-index: 10;
             filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
         }
@@ -163,9 +163,9 @@
             const winningIndex = Math.floor(Math.random() * prizes.length);
             const segmentAngle = (2 * Math.PI) / prizes.length;
             
-            // Стрелка снизу = 270 градусов (3π/2)
+            // Стрелка наверху = 0 градусов
             const randomOffset = Math.random() * segmentAngle;
-            const targetRotation = - (winningIndex * segmentAngle + randomOffset) + (3 * Math.PI / 2);
+            const targetRotation = - (winningIndex * segmentAngle + randomOffset);
             
             const fullRotations = 5 * 2 * Math.PI;
             const finalRotation = fullRotations + targetRotation;
