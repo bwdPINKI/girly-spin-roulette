@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>girly spin</title>
+  <title>girly spin (точная версия)</title>
   <style>
     body {
       background: pink;
@@ -37,11 +37,11 @@
     }
     .pointer {
       position: absolute;
-      top: -45px;
+      top: -50px;
       left: 50%;
       transform: translateX(-50%);
       font-size: 40px;
-      color: #800020;
+      color: red; /* Яркий цвет для контроля */
       text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
       z-index: 10;
     }
@@ -61,17 +61,24 @@
       font-weight: bold;
       margin: 15px 0;
     }
+    .debug {
+      font-size: 12px;
+      color: #888;
+      text-align: left;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>girly spin💞</h1>
+    <h1>girly spin💞 (точная версия)</h1>
     <div class="wheel-container">
       <div class="pointer">▼</div>
       <canvas id="wheelCanvas" width="400" height="400"></canvas>
     </div>
     <button onclick="startSpin()">Крутить барабан!</button>
     <div class="result" id="result">Нажмите кнопку!</div>
+    <div class="debug" id="debug"></div>
   </div>
 
   <script>
@@ -89,7 +96,8 @@
 
     let isSpinning = false;
 
-    function drawWheel(rotation) {
+    // Отрисовка колеса
+    function drawWheel(rotation, showDebug = false) {
       const cx = canvas.width / 2;
       const cy = canvas.height / 2;
       const radius = canvas.width / 2 - 25;
@@ -117,7 +125,17 @@
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        // Текст в секторе (ТОЧНО по центру)
+        // Центр сектора (красная точка для отладки)
+        if (showDebug) {
+          const centerX = cx + Math.cos(start + segmentAngle / 2) * (radius * 0.8);
+          const centerY = cy + Math.sin(start + segmentAngle / 2) * (radius * 0.8);
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, 4, 0, 2 * Math.PI);
+          ctx.fillStyle = 'red';
+          ctx.fill();
+        }
+
+        // Текст в секторе (точная центровка)
         ctx.save();
         ctx.translate(cx, cy);
         ctx.rotate(start + segmentAngle / 2);
@@ -129,7 +147,6 @@
         const text = prizes[i];
         const textWidth = ctx.measureText(text).width;
 
-        // Точная центровка: от центра колеса + отступ + коррекция на ширину текста
         ctx.fillStyle = '#fff';
         ctx.fillText(text, radius * 0.7 - textWidth / 2, 0);
 
@@ -148,61 +165,30 @@
       ctx.restore();
     }
 
+    // Запуск вращения
     function startSpin() {
       if (isSpinning) return;
       isSpinning = true;
       document.getElementById('result').textContent = 'Крутим...';
+      document.getElementById('debug').textContent = '';
 
       const segments = prizes.length;
-      const segmentAngle = (2 * Math.PI) / segments;
+      const segmentAngle = (2 * Math.PI) / segments; // Угол одного сектора (радианы)
+      const degPerSegment = 360 / segments;             // Угол одного сектора (градусы)
 
       // 1. Выбираем случайный приз
       const winningIndex = Math.floor(Math.random() * segments);
 
       // 2. Рассчитываем финальный угол
       const fullRotations = 5 * 2 * Math.PI; // 5 полных оборотов
-      const sectorCenter = -(winningIndex * segmentAngle); // поворот к центру сектора
-      const halfSegment = -segmentAngle / 2; // смещение на половину сектора
+      const sectorCenter = -(winningIndex * segmentAngle); // Поворот к центру сектора
+      const halfSegment = -segmentAngle / 2;           // Смещение на половину сектора
       const targetRotation = sectorCenter + halfSegment;
-
       const finalRotation = fullRotations + targetRotation;
 
-      // 3. Анимация с плавным замедлением
-      const duration = 4000;
-      const startTime = performance.now();
+      // Углы для отладки (в градусах)
+      const finalDeg = (finalRotation * 180 / Math.PI) % 360;
+      const expectedDeg = (-winningIndex * degPerSegment - degPerSegment / 2 + 360) % 360;
 
-      function animate(time) {
-        const elapsed = time - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-
-        // Плавное замедление
-        const ease = 1 - Math.pow(1 - progress, 3);
-        const currentRotation = ease * finalRotation;
-
-        drawWheel(currentRotation);
-
-        if (progress < 1) {
-          requestAnimationFrame(animate);
-        } else {
-          isSpinning = false;
-          document.getElementById('result').textContent =
-            `🎉 Вы выиграли: ${prizes[winningIndex]}!`;
-
-          // Отправка в Telegram
-          if (window.Telegram && Telegram.WebApp) {
-            Telegram.WebApp.sendData(JSON.stringify({
-              prize: prizes[winningIndex],
-              user_id: Telegram.WebApp.initDataUnsafe.user?.id
-            }));
-          }
-        }
-      }
-
-      requestAnimationFrame(animate);
-    }
-
-    // Инициализация
-    drawWheel(0);
-  </script>
-</body>
-</html>
+      document.getElementById('debug').innerHTML = `
+        Выбран сектор:
