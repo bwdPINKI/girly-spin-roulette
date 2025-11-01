@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>girly spin (точная привязка к стрелке)</title>
+  <title>girly spin</title>
   <style>
     body {
       background: pink;
@@ -37,11 +37,12 @@
     }
     .pointer {
       position: absolute;
-      top: -50px;
+      top: -45px;
       left: 50%;
       transform: translateX(-50%);
       font-size: 40px;
-      color: red;
+      color: #800020;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
       z-index: 10;
     }
     button {
@@ -77,6 +78,7 @@
     const canvas = document.getElementById('wheelCanvas');
     const ctx = canvas.getContext('2d');
 
+    // Призы и цвета секторов
     const prizes = [
       "100 РУБ", "200 РУБ", "300 РУБ", "400 РУБ", "500 РУБ",
       "600 РУБ", "700 РУБ", "800 РУБ", "900 РУБ", "1000 РУБ"
@@ -87,8 +89,8 @@
     ];
 
     let isSpinning = false;
-    let winningIndex = -1; // для отладки
 
+    // Отрисовка колеса с заданным углом поворота
     function drawWheel(rotation) {
       const cx = canvas.width / 2;
       const cy = canvas.height / 2;
@@ -111,3 +113,87 @@
         ctx.moveTo(cx, cy);
         ctx.arc(cx, cy, radius, start, end);
         ctx.closePath();
+        ctx.fillStyle = colors[i];
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Текст в секторе (точная центровка)
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(start + segmentAngle / 2);
+
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = 'bold 16px Arial';
+
+        const text = prizes[i];
+        const textWidth = ctx.measureText(text).width;
+
+        ctx.fillStyle = '#fff';
+        ctx.fillText(text, radius * 0.7 - textWidth / 2, 0);
+
+        ctx.restore();
+      }
+
+      // Центр колеса
+      ctx.beginPath();
+      ctx.arc(cx, cy, 20, 0, 2 * Math.PI);
+      ctx.fillStyle = 'white';
+      ctx.fill();
+      ctx.strokeStyle = '#ff1493';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    // Запуск вращения
+    function startSpin() {
+      if (isSpinning) return;
+      isSpinning = true;
+      document.getElementById('result').textContent = 'Крутим...';
+
+      const segments = prizes.length;
+      const segmentAngle = (2 * Math.PI) / segments;
+
+      // 1. Выбираем случайный приз (индекс)
+      const winningIndex = Math.floor(Math.random() * segments);
+
+      // 2. Рассчитываем угол для остановки: центр выбранного сектора должен быть под стрелкой (ось Y)
+      // - Центр сектора: winningIndex * segmentAngle
+      // - Чтобы центр оказался сверху: нужно повернуть на -(centerAngle + π/2)
+      const centerAngle = winningIndex * segmentAngle;
+      const targetRotation = -(centerAngle + Math.PI / 2); // π/2 = 90° (переход от оси X к оси Y)
+
+      // 3. Добавляем 5 полных оборотов для зрелищности
+      const fullRotations = 5 * 2 * Math.PI;
+      const finalRotation = fullRotations + targetRotation;
+
+      // 4. Анимация с плавным замедлением
+      const duration = 4000; // 4 секунды
+      const startTime = performance.now();
+
+      function animate(time) {
+        const elapsed = time - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        // Плавное замедление (ease-out)
+        const ease = 1 - Math.pow(1 - progress, 3);
+        const currentRotation = ease * finalRotation;
+
+        drawWheel(currentRotation);
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          // Остановка
+          isSpinning = false;
+          document.getElementById('result').textContent =
+            `🎉 Вы выиграли: ${prizes[winningIndex]}!`;
+
+          // Отправка в Telegram (если доступно)
+          if (window.Telegram && Telegram.WebApp) {
+            Telegram.WebApp.sendData(JSON.stringify({
+              prize: prizes[winningIndex],
