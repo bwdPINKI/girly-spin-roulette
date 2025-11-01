@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>girly spin (число на Y=0)</title>
+  <title>Барабан фортуны (естественный спин)</title>
   <style>
     body {
       background: pink;
@@ -65,12 +65,12 @@
 </head>
 <body>
   <div class="container">
-    <h1>girly spin💞</h1>
+    <h1>Барабан фортуны💞</h1>
     <div class="wheel-container">
       <div class="pointer">▼</div>
       <canvas id="wheelCanvas" width="400" height="400"></canvas>
     </div>
-    <button onclick="startSpin()">Крутить барабан!</button>
+    <button onclick="startSpin()">Крутить!</button>
     <div class="result" id="result">Нажмите кнопку!</div>
   </div>
 
@@ -88,14 +88,13 @@
     ];
 
     let isSpinning = false;
-
+    let currentRotation = 0; // текущий угол поворота
 
     function drawWheel(rotation) {
       const cx = canvas.width / 2;
       const cy = canvas.height / 2;
       const radius = canvas.width / 2 - 25;
       const segmentAngle = (2 * Math.PI) / prizes.length;
-
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -119,7 +118,7 @@
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        // Текст в секторе (строго на оси Y)
+        // Текст в секторе
         ctx.save();
         ctx.translate(cx, cy);
         ctx.rotate(start + segmentAngle / 2);
@@ -130,10 +129,8 @@
 
         const text = prizes[i];
         const textWidth = ctx.measureText(text).width;
-
-        // Ключевой момент: текст центрируется по оси Y (y = 0)
-        const textX = radius * 0.7 - textWidth / 2; // отступ от центра + центровка по ширине
-        const textY = 0; // строго на оси Y
+        const textX = radius * 0.7 - textWidth / 2;
+        const textY = 0;
 
         ctx.fillStyle = '#fff';
         ctx.fillText(text, textX, textY);
@@ -158,52 +155,88 @@
       isSpinning = true;
       document.getElementById('result').textContent = 'Крутим...';
 
-      const segments = prizes.length;
-      const segmentAngle = (2 * Math.PI) / segments;
-
-      // 1. Выбираем случайный приз
-      const winningIndex = Math.floor(Math.random() * segments);
-
-      // 2. Рассчитываем угол для точной остановки центра сектора на оси Y
-      const centerAngle = winningIndex * segmentAngle; // угол центра сектора в начальном положении
-      const targetRotation = -(centerAngle + Math.PI / 2); // поворот к оси Y
-
-      // 3. Добавляем 5 полных оборотов для зрелищности
-      const fullRotations = 5 * 2 * Math.PI;
-      const finalRotation = fullRotations + targetRotation;
-
-      // 4. Корректировка: округляем до ближайшего «секторного» угла
-      const adjustedFinalRotation = Math.round(finalRotation / segmentAngle) * segmentAngle;
-
-      // 5. Анимация с плавным замедлением
-      const duration = 4000; // 4 секунды
+      const segmentAngle = (2 * Math.PI) / prizes.length;
+      const duration = 3000 + Math.random() * 2000; // 3–5 сек
       const startTime = performance.now();
+      const initialVelocity = 0.1 + Math.random() * 0.2; // начальная скорость
+      const deceleration = 0.0005; // замедление
 
       function animate(time) {
         const elapsed = time - startTime;
-        const progress = Math.min(elapsed / duration, 1);
 
-        // Плавное замедление (ease-out)
-        const ease = 1 - Math.pow(1 - progress, 3);
-        const currentRotation = ease * adjustedFinalRotation;
+        // Физика: скорость уменьшается линейно
+        let velocity = initialVelocity - deceleration * elapsed;
+        if (velocity < 0) velocity = 0;
+
+        currentRotation += velocity;
 
         drawWheel(currentRotation);
 
-        if (progress < 1) {
+        if (velocity > 0.001) {
           requestAnimationFrame(animate);
         } else {
-          // Остановка
+          // Остановка — определяем победителя
           isSpinning = false;
+
+          // 1. Нормализуем угол (0–2π)
+          let normRotation = currentRotation % (2 * Math.PI);
+          if (normRotation < 0) normRotation += 2 * Math.PI;
+
+          // 2. Находим сектор, ближайший к вертикали (угол = 3π/2 или -π/2)
+          const targetAngle = 3 * Math.PI / 2; // ось Y вниз (где стрелка)
+          let minDiff = Infinity;
+          let winnerIndex = 0;
+
+          for (let i = 0; i < prizes.length; i++) {
+            const sectorCenter = i * segmentAngle + segmentAngle / 2;
+            const diff = Math.abs((normRotation + sectorCenter - targetAngle) % (2 * Math.PI));
+            const normalizedDiff = Math.min(diff, 2 * Math.PI - diff);
+
+            if (normalizedDiff < minDiff) {
+              minDiff = normalizedDiff;
+              winnerIndex = i;
+            }
+          }
+
+          // 3. Показываем результат
           document.getElementById('result').textContent =
-            `🎉 Вы выиграли: ${prizes[winningIndex]}!`;
+            `🎉 Вы выиграли: ${prizes[winnerIndex]}!`;
+
+          // 4. Визуальная отметка победителя (красная точка в центре сектора)
+          const cx = canvas.width / 2;
+          const cy = canvas.height / 2;
+          const radius = canvas.width / 2 - 25;
+          const sectorCenterAngle = winnerIndex * segmentAngle + segmentAngle /
+          // 4. Визуальная отметка победителя (красная точка в центре сектора)
+          const cx = canvas.width / 2;
+          const cy = canvas.height / 2;
+          const radius = canvas.width / 2 - 25;
+          const sectorCenterAngle = winnerIndex * segmentAngle + segmentAngle / 2;
+
+          ctx.save();
+          ctx.translate(cx, cy);
+          ctx.rotate(currentRotation + sectorCenterAngle);
+
+          // Красная точка в центре выигрышного сектора
+          ctx.beginPath();
+          ctx.arc(radius * 0.7, 0, 6, 0, 2 * Math.PI);
+          ctx.fillStyle = 'red';
+          ctx.fill();
+
+          ctx.restore();
+
+          // Перерисовываем колесо с отметкой победителя
+          drawWheel(currentRotation);
         }
       }
 
       requestAnimationFrame(animate);
     }
 
-    // Инициализация
-    drawWheel(0);
+    // Инициализация при загрузке
+    window.onload = function() {
+      drawWheel(0);
+    };
   </script>
 </body>
 </html>
