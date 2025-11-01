@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>girly spin (точная остановка на Y=0)</title>
+  <title>girly spin (число на Y=0)</title>
   <style>
     body {
       background: pink;
@@ -89,11 +89,13 @@
 
     let isSpinning = false;
 
+
     function drawWheel(rotation) {
       const cx = canvas.width / 2;
       const cy = canvas.height / 2;
       const radius = canvas.width / 2 - 25;
       const segmentAngle = (2 * Math.PI) / prizes.length;
+
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -117,7 +119,7 @@
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        // Текст в секторе (точная центровка на оси Y)
+        // Текст в секторе (строго на оси Y)
         ctx.save();
         ctx.translate(cx, cy);
         ctx.rotate(start + segmentAngle / 2);
@@ -129,8 +131,8 @@
         const text = prizes[i];
         const textWidth = ctx.measureText(text).width;
 
-        // Ключевой момент: текст центрируется строго на оси Y (y = 0)
-        const textX = radius * 0.7 - textWidth / 2;
+        // Ключевой момент: текст центрируется по оси Y (y = 0)
+        const textX = radius * 0.7 - textWidth / 2; // отступ от центра + центровка по ширине
         const textY = 0; // строго на оси Y
 
         ctx.fillStyle = '#fff';
@@ -163,18 +165,14 @@
       const winningIndex = Math.floor(Math.random() * segments);
 
       // 2. Рассчитываем угол для точной остановки центра сектора на оси Y
-      // - В начальном положении центр сектора: winningIndex * segmentAngle
-      // - Чтобы центр оказался строго сверху (ось Y), нужно повернуть на:
-      //   -(centerAngle + π/2)
-      const centerAngle = winningIndex * segmentAngle;
-      const targetRotation = -(centerAngle + Math.PI / 2);
+      const centerAngle = winningIndex * segmentAngle; // угол центра сектора в начальном положении
+      const targetRotation = -(centerAngle + Math.PI / 2); // поворот к оси Y
 
       // 3. Добавляем 5 полных оборотов для зрелищности
       const fullRotations = 5 * 2 * Math.PI;
       const finalRotation = fullRotations + targetRotation;
 
       // 4. Корректировка: округляем до ближайшего «секторного» угла
-      // Это гарантирует, что колесо остановится строго по центру сектора
       const adjustedFinalRotation = Math.round(finalRotation / segmentAngle) * segmentAngle;
 
       // 5. Анимация с плавным замедлением
@@ -207,3 +205,5 @@
     // Инициализация
     drawWheel(0);
   </script>
+</body>
+</html>
