@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>girly spin (точная версия)</title>
+  <title>girly spin (точная привязка к стрелке)</title>
   <style>
     body {
       background: pink;
@@ -41,8 +41,7 @@
       left: 50%;
       transform: translateX(-50%);
       font-size: 40px;
-      color: red; /* Яркий цвет для контроля */
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      color: red;
       z-index: 10;
     }
     button {
@@ -61,24 +60,17 @@
       font-weight: bold;
       margin: 15px 0;
     }
-    .debug {
-      font-size: 12px;
-      color: #888;
-      text-align: left;
-      margin-top: 10px;
-    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>girly spin💞 (точная версия)</h1>
+    <h1>girly spin💞</h1>
     <div class="wheel-container">
       <div class="pointer">▼</div>
       <canvas id="wheelCanvas" width="400" height="400"></canvas>
     </div>
     <button onclick="startSpin()">Крутить барабан!</button>
     <div class="result" id="result">Нажмите кнопку!</div>
-    <div class="debug" id="debug"></div>
   </div>
 
   <script>
@@ -95,9 +87,9 @@
     ];
 
     let isSpinning = false;
+    let winningIndex = -1; // для отладки
 
-    // Отрисовка колеса
-    function drawWheel(rotation, showDebug = false) {
+    function drawWheel(rotation) {
       const cx = canvas.width / 2;
       const cy = canvas.height / 2;
       const radius = canvas.width / 2 - 25;
@@ -119,76 +111,3 @@
         ctx.moveTo(cx, cy);
         ctx.arc(cx, cy, radius, start, end);
         ctx.closePath();
-        ctx.fillStyle = colors[i];
-        ctx.fill();
-        ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        // Центр сектора (красная точка для отладки)
-        if (showDebug) {
-          const centerX = cx + Math.cos(start + segmentAngle / 2) * (radius * 0.8);
-          const centerY = cy + Math.sin(start + segmentAngle / 2) * (radius * 0.8);
-          ctx.beginPath();
-          ctx.arc(centerX, centerY, 4, 0, 2 * Math.PI);
-          ctx.fillStyle = 'red';
-          ctx.fill();
-        }
-
-        // Текст в секторе (точная центровка)
-        ctx.save();
-        ctx.translate(cx, cy);
-        ctx.rotate(start + segmentAngle / 2);
-
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.font = 'bold 16px Arial';
-
-        const text = prizes[i];
-        const textWidth = ctx.measureText(text).width;
-
-        ctx.fillStyle = '#fff';
-        ctx.fillText(text, radius * 0.7 - textWidth / 2, 0);
-
-        ctx.restore();
-      }
-
-      // Центр колеса
-      ctx.beginPath();
-      ctx.arc(cx, cy, 20, 0, 2 * Math.PI);
-      ctx.fillStyle = 'white';
-      ctx.fill();
-      ctx.strokeStyle = '#ff1493';
-      ctx.lineWidth = 3;
-      ctx.stroke();
-
-      ctx.restore();
-    }
-
-    // Запуск вращения
-    function startSpin() {
-      if (isSpinning) return;
-      isSpinning = true;
-      document.getElementById('result').textContent = 'Крутим...';
-      document.getElementById('debug').textContent = '';
-
-      const segments = prizes.length;
-      const segmentAngle = (2 * Math.PI) / segments; // Угол одного сектора (радианы)
-      const degPerSegment = 360 / segments;             // Угол одного сектора (градусы)
-
-      // 1. Выбираем случайный приз
-      const winningIndex = Math.floor(Math.random() * segments);
-
-      // 2. Рассчитываем финальный угол
-      const fullRotations = 5 * 2 * Math.PI; // 5 полных оборотов
-      const sectorCenter = -(winningIndex * segmentAngle); // Поворот к центру сектора
-      const halfSegment = -segmentAngle / 2;           // Смещение на половину сектора
-      const targetRotation = sectorCenter + halfSegment;
-      const finalRotation = fullRotations + targetRotation;
-
-      // Углы для отладки (в градусах)
-      const finalDeg = (finalRotation * 180 / Math.PI) % 360;
-      const expectedDeg = (-winningIndex * degPerSegment - degPerSegment / 2 + 360) % 360;
-
-      document.getElementById('debug').innerHTML = `
-        Выбран сектор:
