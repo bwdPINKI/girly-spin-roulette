@@ -197,3 +197,17 @@
           if (window.Telegram && Telegram.WebApp) {
             Telegram.WebApp.sendData(JSON.stringify({
               prize: prizes[winningIndex],
+              user_id: Telegram.WebApp.initDataUnsafe.user?.id
+            }));
+          }
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    // Инициализация: отрисовка неподвижного колеса
+    drawWheel(0);
+  </script>
+</body>
+</html>
