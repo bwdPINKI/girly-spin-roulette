@@ -1,229 +1,217 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>girly spin</title>
-  <style>
-    body {
-      background: pink;
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-    }
-    .container {
-      background: white;
-      border-radius: 20px;
-      padding: 30px;
-      text-align: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    }
-    h1 {
-      color: #ff1493;
-      margin-bottom: 20px;
-    }
-    .wheel-container {
-      position: relative;
-      margin: 20px auto;
-      width: 400px;
-      height: 400px;
-    }
-    #wheelCanvas {
-      border-radius: 50%;
-      box-shadow: 0 0 0 8px #ff1493;
-    }
-    .pointer {
-      position: absolute;
-      top: -45px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 40px;
-      color: #800020;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-      z-index: 10;
-    }
-    button {
-      background: #ff1493;
-      color: white;
-      border: none;
-      padding: 15px 30px;
-      font-size: 18px;
-      border-radius: 25px;
-      cursor: pointer;
-      margin: 15px 0;
-    }
-    .result {
-      font-size: 20px;
-      color: #ff1493;
-      font-weight: bold;
-      margin: 15px 0;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>girly spin</title>
+    <style>
+        body {
+            background: pink;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            color: #ff1493;
+            margin-bottom: 20px;
+        }
+        
+        .wheel-container {
+            position: relative;
+            margin: 20px auto;
+            width: 400px;
+            height: 400px;
+        }
+        
+        #wheelCanvas {
+            border-radius: 50%;
+            box-shadow: 0 0 0 8px #ff1493;
+            display: block;
+            background: white;
+        }
+        
+        .pointer {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 40px;
+            color: #800020;
+            text-shadow: 2px 2px 0 #000;
+            z-index: 10;
+        }
+        
+        button {
+            background: #ff1493;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 15px 0;
+        }
+        
+        .result {
+            font-size: 20px;
+            color: #ff1493;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>girly spin💞</h1>
-    <div class="wheel-container">
-      <div class="pointer">▼</div>
-      <canvas id="wheelCanvas" width="400" height="400"></canvas>
-    </div>
-    <button onclick="startSpin()">Крутить!</button>
-    <div class="result" id="result">Нажмите кнопку!</div>
-  </div>
-
-  <script>
-    const canvas = document.getElementById('wheelCanvas');
-    const ctx = canvas.getContext('2d');
-
-    const prizes = [
-      "100 РУБ", "200 РУБ", "300 РУБ", "400 РУБ", "500 РУБ",
-      "600 РУБ", "700 РУБ", "800 РУБ", "900 РУБ", "1000 РУБ"
-    ];
-    const colors = [
-      '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57',
-      '#FF9FF3', '#54A0FF', '#5F27CD', '#00D2D3', '#FF9F43'
-    ];
-
-    let isSpinning = false;
-    let currentRotation = 0;
-
-    function drawWheel(rotation) {
-      const cx = canvas.width / 2;
-      const cy = canvas.height / 2;
-      const radius = canvas.width / 2 - 25;
-      const segmentAngle = (2 * Math.PI) / prizes.length;
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      ctx.save();
-      ctx.translate(cx, cy);
-      ctx.rotate(rotation);
-      ctx.translate(-cx, -cy);
-
-      for (let i = 0; i < prizes.length; i++) {
-        const start = i * segmentAngle;
-        const end = start + segmentAngle;
-
-        // Сектор
-        ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.arc(cx, cy, radius, start, end);
-        ctx.closePath();
-        ctx.fillStyle = colors[i];
-        ctx.fill();
+    <div class="container">
+        <h1>girly spin💞</h1>
         
-        // Черные границы между секторами
-        ctx.strokeStyle = '#000';
-        ctx.lineWidth = 2;
-        ctx.stroke();
+        <div class="wheel-container">
+            <div class="pointer">⬇</div>
+            <canvas id="wheelCanvas" width="400" height="400"></canvas>
+        </div>
+        
+        <button onclick="startSpin()">Крутить барабан!</button>
+        <div class="result" id="result">Нажмите кнопку!</div>
+    </div>
 
-        // Текст в секторе
-        ctx.save();
-        ctx.translate(cx, cy);
-        ctx.rotate(start + segmentAngle / 2);
+    <script>
+        const canvas = document.getElementById('wheelCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Проверяем что canvas доступен
+        console.log("Canvas:", canvas);
+        console.log("Context:", ctx);
+        
+        const prizes = ["100 РУБ", "200 РУБ", "300 РУБ", "400 РУБ", "500 РУБ", 
+                       "600 РУБ", "700 РУБ", "800 РУБ", "900 РУБ", "1000 РУБ"];
+        const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57',
+                       '#FF9FF3', '#54A0FF', '#5F27CD', '#00D2D3', '#FF9F43'];
+        
+        let isSpinning = false;
 
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.font = 'bold 16px Arial';
-        ctx.fillStyle = '#000'; // Черный цвет текста
-        ctx.fillText(prizes[i], radius * 0.7, 0);
-
-        ctx.restore();
-      }
-
-      // Центр колеса
-      ctx.beginPath();
-      ctx.arc(cx, cy, 20, 0, 2 * Math.PI);
-      ctx.fillStyle = 'white';
-      ctx.fill();
-      ctx.strokeStyle = '#ff1493';
-      ctx.lineWidth = 3;
-      ctx.stroke();
-
-      ctx.restore();
-    }
-
-    function startSpin() {
-      if (isSpinning) return;
-      isSpinning = true;
-      document.getElementById('result').textContent = 'Крутим...';
-
-      const segmentAngle = (2 * Math.PI) / prizes.length;
-      const duration = 3000 + Math.random() * 2000;
-      const startTime = performance.now();
-      const initialVelocity = 0.1 + Math.random() * 0.2;
-      const deceleration = 0.0005;
-
-      function animate(time) {
-        const elapsed = time - startTime;
-
-        let velocity = initialVelocity - deceleration * elapsed;
-        if (velocity < 0) velocity = 0;
-
-        currentRotation += velocity;
-
-        drawWheel(currentRotation);
-
-        if (velocity > 0.001) {
-          requestAnimationFrame(animate);
-        } else {
-          // Остановка — определяем победителя
-          isSpinning = false;
-
-          // 1. Нормализуем угол (0–2π)
-          let normRotation = currentRotation % (2 * Math.PI);
-          if (normRotation < 0) normRotation += 2 * Math.PI;
-
-          // 2. Находим сектор, ближайший к стрелке (сверху = 3π/2)
-          const targetAngle = 3 * Math.PI / 2;
-          let minDiff = Infinity;
-          let winnerIndex = 0;
-
-          for (let i = 0; i < prizes.length; i++) {
-            const sectorCenter = i * segmentAngle + segmentAngle / 2;
-            const diff = Math.abs((normRotation + sectorCenter - targetAngle) % (2 * Math.PI));
-            const normalizedDiff = Math.min(diff, 2 * Math.PI - diff);
-
-            if (normalizedDiff < minDiff) {
-              minDiff = normalizedDiff;
-              winnerIndex = i;
+        // ПРОСТАЯ ОТРИСОВКА БАРАБАНА
+        function drawWheel(rotation = 0) {
+            console.log("Рисуем барабан с вращением:", rotation);
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = canvas.width / 2 - 20;
+            const segmentAngle = (2 * Math.PI) / prizes.length;
+            
+            // Очищаем canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Рисуем белый фон
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Применяем вращение
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(rotation);
+            ctx.translate(-centerX, -centerY);
+            
+            // Рисуем сегменты
+            for (let i = 0; i < prizes.length; i++) {
+                const startAngle = i * segmentAngle;
+                const endAngle = (i + 1) * segmentAngle;
+                
+                // Рисуем сегмент
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                ctx.closePath();
+                ctx.fillStyle = colors[i];
+                ctx.fill();
+                
+                // Черная граница
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                // Текст
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(startAngle + segmentAngle / 2);
+                ctx.textAlign = 'center';
+                ctx.fillStyle = '#000';
+                ctx.font = 'bold 14px Arial';
+                ctx.fillText(prizes[i], radius - 40, 0);
+                ctx.restore();
             }
-          }
-
-          // 3. Показываем результат
-          document.getElementById('result').textContent =
-            `🎉 Вы выиграли: ${prizes[winnerIndex]}!`;
-
-          // 4. Отмечаем победителя
-          const cx = canvas.width / 2;
-          const cy = canvas.height / 2;
-          const radius = canvas.width / 2 - 25;
-          const sectorCenterAngle = winnerIndex * segmentAngle + segmentAngle / 2;
-
-          ctx.save();
-          ctx.translate(cx, cy);
-          ctx.rotate(currentRotation + sectorCenterAngle);
-
-          // Красная точка
-          ctx.beginPath();
-          ctx.arc(radius * 0.7, 0, 6, 0, 2 * Math.PI);
-          ctx.fillStyle = 'red';
-          ctx.fill();
-
-          ctx.restore();
+            
+            // Центральный круг
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 20, 0, 2 * Math.PI);
+            ctx.fillStyle = 'white';
+            ctx.fill();
+            ctx.strokeStyle = '#ff1493';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            ctx.restore();
         }
-      }
 
-      requestAnimationFrame(animate);
-    }
+        function startSpin() {
+            if (isSpinning) return;
+            
+            isSpinning = true;
+            document.getElementById('result').textContent = 'Крутим...';
+            
+            const winningIndex = Math.floor(Math.random() * prizes.length);
+            const segmentAngle = (2 * Math.PI) / prizes.length;
+            
+            // Простая логика вращения
+            const targetRotation = - (winningIndex * segmentAngle);
+            const fullRotations = 5 * 2 * Math.PI;
+            const finalRotation = fullRotations + targetRotation;
+            
+            const startTime = performance.now();
+            const duration = 3000;
+            
+            function animate(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                const currentRotation = easeOut * finalRotation;
+                
+                drawWheel(currentRotation);
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    isSpinning = false;
+                    document.getElementById('result').textContent = 
+                        `🎉 Вы выиграли: ${prizes[winningIndex]}!`;
+                }
+            }
+            
+            requestAnimationFrame(animate);
+        }
 
-    // Инициализация
-    window.onload = function() {
-      drawWheel(0);
-    };
-  </script>
+        // СРАЗУ рисуем барабан при загрузке
+        window.onload = function() {
+            console.log("Страница загружена, рисуем барабан...");
+            drawWheel();
+        };
+        
+        // И на всякий случай рисуем через секунду
+        setTimeout(() => {
+            console.log("Принудительная отрисовка...");
+            drawWheel();
+        }, 1000);
+    </script>
 </body>
 </html>
