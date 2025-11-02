@@ -104,7 +104,6 @@
             
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Белый фон
             ctx.fillStyle = 'white';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
@@ -155,13 +154,12 @@
             isSpinning = true;
             document.getElementById('result').textContent = 'Крутим...';
             
-            // ВЫБИРАЕМ число которое должно оказаться НА ВЕРХУ (Y координата)
             const winningIndex = Math.floor(Math.random() * prizes.length);
             const segmentAngle = (2 * Math.PI) / prizes.length;
             
-            // Ключевое изменение: крутим так, чтобы ВЕРХ сегмента (не центр) был наверху
-            // Верх сегмента = начало сегмента + небольшое смещение чтобы текст был виден
-            const targetRotation = - (winningIndex * segmentAngle) - (segmentAngle * 0.1);
+            // ИСПРАВЛЕНИЕ: Стрелка сверху = 270° = 3π/2
+            // Чтобы число оказалось сверху, нужно повернуть его к позиции 3π/2
+            const targetRotation = - (winningIndex * segmentAngle) + (3 * Math.PI / 2);
             
             const fullRotations = 5 * 2 * Math.PI;
             const finalRotation = fullRotations + targetRotation;
