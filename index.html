@@ -157,9 +157,8 @@
             const winningIndex = Math.floor(Math.random() * prizes.length);
             const segmentAngle = (2 * Math.PI) / prizes.length;
             
-            // ИСПРАВЛЕНИЕ: Стрелка сверху = 270° = 3π/2
-            // Чтобы число оказалось сверху, нужно повернуть его к позиции 3π/2
-            const targetRotation = - (winningIndex * segmentAngle) + (3 * Math.PI / 2);
+            // Ключевое исправление: останавливаемся в ЦЕНТРЕ сегмента под стрелкой
+            const targetRotation = - (winningIndex * segmentAngle) + (3 * Math.PI / 2) - (segmentAngle / 2);
             
             const fullRotations = 5 * 2 * Math.PI;
             const finalRotation = fullRotations + targetRotation;
