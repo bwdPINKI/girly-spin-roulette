@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Барабан фортуны (естественный спин)</title>
+  <title>girly spin</title>
   <style>
     body {
       background: pink;
@@ -31,7 +31,7 @@
       width: 400px;
       height: 400px;
     }
-    .wheelCanvas {
+    #wheelCanvas {
       border-radius: 50%;
       box-shadow: 0 0 0 8px #ff1493;
     }
@@ -65,7 +65,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>Барабан фортуны💞</h1>
+    <h1>girly spin💞</h1>
     <div class="wheel-container">
       <div class="pointer">▼</div>
       <canvas id="wheelCanvas" width="400" height="400"></canvas>
@@ -88,7 +88,7 @@
     ];
 
     let isSpinning = false;
-    let currentRotation = 0; // текущий угол поворота
+    let currentRotation = 0;
 
     function drawWheel(rotation) {
       const cx = canvas.width / 2;
@@ -114,7 +114,9 @@
         ctx.closePath();
         ctx.fillStyle = colors[i];
         ctx.fill();
-        ctx.strokeStyle = '#fff';
+        
+        // Черные границы между секторами
+        ctx.strokeStyle = '#000';
         ctx.lineWidth = 2;
         ctx.stroke();
 
@@ -126,14 +128,8 @@
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.font = 'bold 16px Arial';
-
-        const text = prizes[i];
-        const textWidth = ctx.measureText(text).width;
-        const textX = radius * 0.7 - textWidth / 2;
-        const textY = 0;
-
-        ctx.fillStyle = '#fff';
-        ctx.fillText(text, textX, textY);
+        ctx.fillStyle = '#000'; // Черный цвет текста
+        ctx.fillText(prizes[i], radius * 0.7, 0);
 
         ctx.restore();
       }
@@ -156,15 +152,14 @@
       document.getElementById('result').textContent = 'Крутим...';
 
       const segmentAngle = (2 * Math.PI) / prizes.length;
-      const duration = 3000 + Math.random() * 2000; // 3–5 сек
+      const duration = 3000 + Math.random() * 2000;
       const startTime = performance.now();
-      const initialVelocity = 0.1 + Math.random() * 0.2; // начальная скорость
-      const deceleration = 0.0005; // замедление
+      const initialVelocity = 0.1 + Math.random() * 0.2;
+      const deceleration = 0.0005;
 
       function animate(time) {
         const elapsed = time - startTime;
 
-        // Физика: скорость уменьшается линейно
         let velocity = initialVelocity - deceleration * elapsed;
         if (velocity < 0) velocity = 0;
 
@@ -182,8 +177,8 @@
           let normRotation = currentRotation % (2 * Math.PI);
           if (normRotation < 0) normRotation += 2 * Math.PI;
 
-          // 2. Находим сектор, ближайший к вертикали (угол = 3π/2 или -π/2)
-          const targetAngle = 3 * Math.PI / 2; // ось Y вниз (где стрелка)
+          // 2. Находим сектор, ближайший к стрелке (сверху = 3π/2)
+          const targetAngle = 3 * Math.PI / 2;
           let minDiff = Infinity;
           let winnerIndex = 0;
 
@@ -202,12 +197,7 @@
           document.getElementById('result').textContent =
             `🎉 Вы выиграли: ${prizes[winnerIndex]}!`;
 
-          // 4. Визуальная отметка победителя (красная точка в центре сектора)
-          const cx = canvas.width / 2;
-          const cy = canvas.height / 2;
-          const radius = canvas.width / 2 - 25;
-          const sectorCenterAngle = winnerIndex * segmentAngle + segmentAngle /
-          // 4. Визуальная отметка победителя (красная точка в центре сектора)
+          // 4. Отмечаем победителя
           const cx = canvas.width / 2;
           const cy = canvas.height / 2;
           const radius = canvas.width / 2 - 25;
@@ -217,23 +207,20 @@
           ctx.translate(cx, cy);
           ctx.rotate(currentRotation + sectorCenterAngle);
 
-          // Красная точка в центре выигрышного сектора
+          // Красная точка
           ctx.beginPath();
           ctx.arc(radius * 0.7, 0, 6, 0, 2 * Math.PI);
           ctx.fillStyle = 'red';
           ctx.fill();
 
           ctx.restore();
-
-          // Перерисовываем колесо с отметкой победителя
-          drawWheel(currentRotation);
         }
       }
 
       requestAnimationFrame(animate);
     }
 
-    // Инициализация при загрузке
+    // Инициализация
     window.onload = function() {
       drawWheel(0);
     };
